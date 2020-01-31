@@ -23,4 +23,5 @@ urlpatterns = [
     re_path(r'^admin/', admin.site.urls),
     re_path(r'^display/', budget_views.show_data),
     re_path(r'^upload/', budget_views.upload_data),
+    re_path(r'^upload_done/', budget_views.upload_done),
 ]

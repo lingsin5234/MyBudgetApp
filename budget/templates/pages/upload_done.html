@@ -1,0 +1,12 @@
+{% include 'partials/header.html' %}
+    <h1>Upload Completed</h1>
+
+    <p>The following information was uploaded:</p>
+    <ul>
+        <li>{{line_item.name}}</li>
+        <li>{{line_item.category}}</li>
+        <li>{{line_item.date_stamp}}</li>
+        <li>{{line_item.amount}}</li>
+    </ul>
+
+{% include 'partials/footer.html' %}

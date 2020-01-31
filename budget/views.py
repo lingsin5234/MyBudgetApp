@@ -24,10 +24,16 @@ def upload_data(request):
             # process the data in form.cleaned_data as required
             form.save()
             # redirect to a new URL:
-            return HttpResponseRedirect('/thanks/')
+            return HttpResponseRedirect('/upload_done/')
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = UploadDataForm()
 
     return render(request, 'pages/upload.html', {'form': form})
+
+
+def upload_done(request):
+    item = LineItem.objects.latest('pk')
+    context = {'line_item': item}
+    return render(request, 'pages/upload_done.html', context)
