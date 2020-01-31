@@ -1,7 +1,7 @@
 {% include 'partials/header.html' %}
     <h1>Upload Data</h1>
 
-    <form action="/upload_data/" method="post">
+    <form action="/upload/" method="post">
         {% csrf_token %}
         {{ form }}
         <input type="submit" value="Submit">
