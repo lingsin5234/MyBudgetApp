@@ -7,6 +7,6 @@ def show_data(request):
     items = LineItem.objects.all()
 
     context = {
-        'line_item': items
+        'line_items': items
     }
     return render(request, 'pages/display.html', context)

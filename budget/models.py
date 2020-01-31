@@ -7,4 +7,6 @@ class LineItem(models.Model):
     category = models.CharField(max_length=20)
     date_stamp = models.DateField()
     amount = models.FloatField()
-    
+
+    def __str__(self):
+        return self.name
