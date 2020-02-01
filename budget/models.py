@@ -12,7 +12,6 @@ class Category(models.Model):
 # Line Item
 class LineItem(models.Model):
     name = models.CharField(max_length=30)
-    # category = models.CharField(max_length=20)
     category = models.OneToOneField(Category, on_delete=models.SET_DEFAULT, default='Uncategorized')
     date_stamp = models.DateField()
     amount = models.FloatField()
