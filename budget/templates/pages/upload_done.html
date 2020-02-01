@@ -3,10 +3,12 @@
 
     <p>The following information was uploaded:</p>
     <ul>
-        <li>{{line_item.name}}</li>
-        <li>{{line_item.category}}</li>
-        <li>{{line_item.date_stamp}}</li>
-        <li>{{line_item.amount}}</li>
+        <li>{{item.name}}</li>
+        {% if upload_type == "line_item" %}
+        <li>{{item.category}}</li>
+        <li>{{item.date_stamp}}</li>
+        <li>{{item.amount}}</li>
+        {% endif %}
     </ul>
 
 {% include 'partials/footer.html' %}

@@ -22,6 +22,6 @@ from budget import views as budget_views
 urlpatterns = [
     re_path(r'^admin/', admin.site.urls),
     re_path(r'^display/', budget_views.show_data),
-    re_path(r'^upload/(?P<upload_type>[\w_]+)/$', budget_views.upload_data),
-    re_path(r'^upload_done/', budget_views.upload_done),
+    re_path(r'^upload/(?P<upload_type>[\w_]+)/$', budget_views.upload_data, name='upload_data'),
+    re_path(r'^upload/upload_done/(?P<upload_type>[\w_]+)/$', budget_views.upload_done, name='upload_done'),
 ]
