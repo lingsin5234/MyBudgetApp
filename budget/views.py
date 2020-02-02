@@ -19,7 +19,6 @@ def upload_data(request, upload_type):
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         if upload_type == 'line_item':
-            print(request.POST)
             form = UploadLineItemForm(request.POST)
 
             # check whether it's valid:
@@ -29,8 +28,6 @@ def upload_data(request, upload_type):
                 # redirect to a new URL:
                 return HttpResponseRedirect('/upload_done/line_item/')
         else:
-            print("HELLO?")
-            print(request.POST)
             form = UploadCategoryForm(request.POST)
 
             # check whether it's valid:
@@ -45,10 +42,14 @@ def upload_data(request, upload_type):
         if upload_type == 'line_item':
             form = UploadLineItemForm()
         else:
-            print("First")
             form = UploadCategoryForm()
 
-    return render(request, 'pages/upload.html', {'form': form})
+    context = {
+        'form': form,
+        'upload_type': upload_type
+    }
+
+    return render(request, 'pages/upload.html', context)
 
 
 def upload_done(request, upload_type):
