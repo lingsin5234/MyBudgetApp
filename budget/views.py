@@ -54,11 +54,14 @@ def upload_data(request, upload_type):
 
 def upload_done(request, upload_type):
     if upload_type == 'line_item':
+        upload_name = 'Line Item'
         item = LineItem.objects.latest('pk')
     else:
+        upload_name = 'Category'
         item = Category.objects.latest('pk')
     context = {
         'upload_type': upload_type,
+        'upload_name': upload_name,
         'item': item
     }
     return render(request, 'pages/upload_done.html', context)

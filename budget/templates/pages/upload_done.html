@@ -1,7 +1,7 @@
 {% include 'partials/header.html' %}
     <h1>Upload Completed</h1>
 
-    <p>The following information was uploaded:</p>
+    <p>{{upload_name}} was uploaded:</p>
     <ul>
         <li>{{item.name}}</li>
         {% if upload_type == "line_item" %}
