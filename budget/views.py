@@ -15,6 +15,9 @@ def show_data(request):
 
 
 def upload_data(request, upload_type):
+    # default upload_name
+    upload_name = 'Line Item'
+
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -28,6 +31,7 @@ def upload_data(request, upload_type):
                 # redirect to a new URL:
                 return HttpResponseRedirect('/upload_done/line_item/')
         else:
+            upload_name = 'Category'
             form = UploadCategoryForm(request.POST)
 
             # check whether it's valid:
@@ -42,11 +46,13 @@ def upload_data(request, upload_type):
         if upload_type == 'line_item':
             form = UploadLineItemForm()
         else:
+            upload_name = 'Category'
             form = UploadCategoryForm()
 
     context = {
         'form': form,
-        'upload_type': upload_type
+        'upload_type': upload_type,
+        'upload_name': upload_name
     }
 
     return render(request, 'pages/upload.html', context)

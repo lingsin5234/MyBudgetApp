@@ -1,5 +1,5 @@
 {% include 'partials/header.html' %}
-    <h1>Upload Data</h1>
+    <h1>Upload {{upload_name}}</h1>
 
     <form action="/upload/{{upload_type}}/" method="post">
         {% csrf_token %}
