@@ -23,8 +23,7 @@
         var theData = JSON.parse({{ line_items|safe }});
         // print(theData);
         // var theData = {{line_items}};
-        d3.select("body").selectAll("p").datum(theData)
-        .enter().append("p").text( function(d) {return d});
+        d3.json(theData, function(d) {console.log(d)});
 
     </script>
 
