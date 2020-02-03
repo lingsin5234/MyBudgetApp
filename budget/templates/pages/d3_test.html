@@ -16,8 +16,21 @@
         .attr("r", 25).style("fill", "yellow");
     </script>
 
-
+    <p>Output data list passed in the Views: {{data}}</p>
     <script>
+        var data = {{data}};
+        var svgContainer = d3.select("body").append("svg")
+            .attr("width", 500).attr("height", 500);
+        var circles = svgContainer.selectAll("circle")
+            .data(data).enter().append("circle");
+        var circleAttributes = circles
+            .attr("cx", function(d) { return d; })
+            .attr("cy", function(d) { return d; })
+            .attr("r", 20).style("fill", "orange");
+    </script>
+
+
+    <!--script>
 
         // var theData = JSON.parse({{ item }});
         var theData = JSON.parse({{ line_items|safe }});
@@ -25,6 +38,6 @@
         // var theData = {{line_items}};
         d3.json(theData, function(d) {console.log(d)});
 
-    </script>
+    </script-->
 
 {% include 'partials/footer.html' %}

@@ -30,7 +30,7 @@ def show_d3(request):
         # output[i] = add
         # i += 1
     # output = json.dumps(items[:])
-    data = [13, 2, 3]
+    data = [30, 65, 300]
     context = {
         'line_items': json.dumps(output[0], cls=DjangoJSONEncoder),
         'data': data,
