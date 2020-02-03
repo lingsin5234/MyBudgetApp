@@ -1,0 +1,11 @@
+{% include 'partials/header.html' %}
+    <h1>D3.js Test Page</h1>
+
+    <p>Using Line Items...</p>
+    <ul>
+        {% for item in line_items %}
+        <li>{{item}}</li>
+        {% endfor %}
+    </ul>
+
+{% include 'partials/footer.html' %}

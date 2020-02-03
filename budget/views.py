@@ -4,7 +4,7 @@ from .models import LineItem, Category, CreditCard, ExpenseLineItem
 from .forms import UploadLineItemForm, UploadCategoryForm, UploadCreditCardForm, UploadExpenseForm
 
 
-# Create your views here.
+# line item test view
 def show_data(request):
     items = LineItem.objects.all()
 
@@ -12,6 +12,16 @@ def show_data(request):
         'line_items': items
     }
     return render(request, 'pages/display.html', context)
+
+
+# d3.js test view
+def show_d3(request):
+    items = LineItem.objects.all()
+
+    context = {
+        'line_items': items
+    }
+    return render(request, 'pages/d3_test.html', context)
 
 
 def upload_data(request, upload_type):
