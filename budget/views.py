@@ -2,6 +2,10 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from .models import LineItem, Category, CreditCard, ExpenseLineItem
 from .forms import UploadLineItemForm, UploadCategoryForm, UploadCreditCardForm, UploadExpenseForm
+from django.core import serializers
+from django.core.serializers.json import DjangoJSONEncoder
+import json
+from django.forms.models import model_to_dict
 
 
 # line item test view
@@ -16,10 +20,22 @@ def show_data(request):
 
 # d3.js test view
 def show_d3(request):
-    items = LineItem.objects.all()
 
+    # serialize all LineItem objects and convert to json format
+    items = LineItem.objects.all()
+    output = []
+    for item in items:
+        add = model_to_dict(item)
+        output.append(add)
+        # output[i] = add
+        # i += 1
+    # output = json.dumps(items[:])
+    data = [13, 2, 3]
     context = {
-        'line_items': items
+        # 'line_items': json.dumps(output[:], cls=DjangoJSONEncoder),
+        'data': data,
+        'line_items': output,
+        'type': type(data)
     }
     return render(request, 'pages/d3_test.html', context)
 

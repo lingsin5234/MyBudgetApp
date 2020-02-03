@@ -2,10 +2,33 @@
     <h1>D3.js Test Page</h1>
 
     <p>Using Line Items...</p>
-    <ul>
-        {% for item in line_items %}
+    <p>{{type}}</p>
+    <!--ul>
+        {% for item in data %}
         <li>{{item}}</li>
         {% endfor %}
-    </ul>
+    </ul-->
+
+    <script>
+        d3.select("body").append("svg")
+        .attr("width", 50).attr("height", 50)
+        .append("circle").attr("cx", 25).attr("cy", 25)
+        .attr("r", 25).style("fill", "yellow");
+    </script>
+
+    {% for item in line_items|safe %}
+    <li>{{item}}</li>
+    <script>
+
+        var theData = JSON.parse({{ item }});
+        // var theData = JSON.parse({{ line_items|safe }});
+        // print(theData);
+        // var theData = {{line_items}};
+        d3.select("body").selectAll("p").data(theData)
+        .enter().append("p").text(function(d) { return d });
+
+
+    </script>
+    {% endfor %}
 
 {% include 'partials/footer.html' %}
