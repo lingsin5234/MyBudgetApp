@@ -1,4 +1,13 @@
 body {
+    background-color: #38383d;
+    color: #eeeeee;
+}
+h1 {
     background-color: #4D4D64;
     color: #FF7C00;
+}
+input, select {
+    background-color: #333333;
+    border-color: #555555;
+    color: #eeeeee;
 }
