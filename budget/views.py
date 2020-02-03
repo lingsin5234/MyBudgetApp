@@ -32,10 +32,10 @@ def show_d3(request):
     # output = json.dumps(items[:])
     data = [13, 2, 3]
     context = {
-        # 'line_items': json.dumps(output[:], cls=DjangoJSONEncoder),
+        'line_items': json.dumps(output[0], cls=DjangoJSONEncoder),
         'data': data,
-        'line_items': output,
-        'type': type(data)
+        # 'line_items': output,
+        'type': output[0]
     }
     return render(request, 'pages/d3_test.html', context)
 

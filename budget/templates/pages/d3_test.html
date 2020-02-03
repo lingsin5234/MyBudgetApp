@@ -16,19 +16,16 @@
         .attr("r", 25).style("fill", "yellow");
     </script>
 
-    {% for item in line_items|safe %}
-    <li>{{item}}</li>
+
     <script>
 
-        var theData = JSON.parse({{ item }});
-        // var theData = JSON.parse({{ line_items|safe }});
+        // var theData = JSON.parse({{ item }});
+        var theData = JSON.parse({{ line_items|safe }});
         // print(theData);
         // var theData = {{line_items}};
-        d3.select("body").selectAll("p").data(theData)
-        .enter().append("p").text(function(d) { return d });
-
+        d3.select("body").selectAll("p").datum(theData)
+        .enter().append("p").text( function(d) {return d});
 
     </script>
-    {% endfor %}
 
 {% include 'partials/footer.html' %}
