@@ -30,6 +30,7 @@ class CreditCard(models.Model):
 
 # Expenses Line Item
 class ExpenseLineItem(models.Model):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=30)
     category = models.OneToOneField(Category, on_delete=models.SET_DEFAULT, default='Uncategorized')
     pay_type = models.CharField(max_length=10)
