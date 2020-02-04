@@ -31,9 +31,30 @@ def show_d3(request):
         # i += 1
     # output = json.dumps(items[:])
     data = [30, 65, 300]
+    json_data = [
+        {
+            "x_axis": 30,
+            "y_axis": 30,
+            "radius": 20,
+            "color": "purple",
+        },
+        {
+            "x_axis": 65,
+            "y_axis": 65,
+            "radius": 20,
+            "color": "orange",
+        },
+        {
+            "x_axis": 200,
+            "y_axis": 200,
+            "radius": 20,
+            "color": "green",
+        }
+    ]
     context = {
-        'line_items': json.dumps(output[0], cls=DjangoJSONEncoder),
+        'line_items': json.dumps(output, cls=DjangoJSONEncoder),
         'data': data,
+        'json_data': json.dumps(json_data),
         # 'line_items': output,
         'type': output[0]
     }
