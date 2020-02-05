@@ -68,15 +68,20 @@
     <script>
         var exp_list = JSON.parse('{{expenses|safe}}');
         var category = JSON.parse('{{category|safe}}');
-        var bubbles = d3.select("body").append("svg")
+        var bar_chart = d3.select("body").append("svg")
             .attr("width", exp_list.length*100).attr("height", exp_list.length*100);
-        var circles = bubbles.selectAll("circle")
-            .data(exp_list).enter().append("circle");
-        var circle_attributes = circles
-            .attr("cx", function(d) { return 50 })
-            .attr("cy", function(d) { return (d.id-0.5)*50 })
-            .attr("r", function(d) { return d.amount/10 })
+        var bars = bar_chart.selectAll("bar")
+            .data(exp_list).enter().append("rect");
+        var bar_attributes = bars
+            .attr("x", 10)
+            .attr("y", function(d) { return (d.id-0.95)*100 })
+            .attr("width", function(d) { return d.amount })
+            .attr("height", 95)
             .style("fill", function(d) { return category[d.category-1].colour; })
+        //var bar_text = bars
+            //.style("text-anchor", "end")
+            //.attr("dx", -.8em")
+            //.attr("dy", -.55em")
             .text(function(d) { return "$" + d.amount; });
     </script>
 
