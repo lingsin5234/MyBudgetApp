@@ -53,11 +53,13 @@ def show_d3(request):
     ]
     expenses = [
         {
+            "id": 1,
             "name": "McDonalds",
             "category": "Food",
             "amount": 12.40
         },
         {
+            "id": 2,
             "name": "Gateway Entertainment",
             "category": "Activities",
             "amount": 11.00

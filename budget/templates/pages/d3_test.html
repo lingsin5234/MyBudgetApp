@@ -78,15 +78,16 @@
         var circles = bubbles.selectAll("circle")
             .data(exp_list).enter().append("circle");
         var circle_attributes = circles
-            .attr("cx", function(d) { return d.id })
-            .attr("cy", function(d) { return d.amount })
-            .attr("r", function(d) {return d.amount })
+            .attr("cx", function(d) { return d.amount })
+            .attr("cy", function(d) { return d.amount*(10-d.id) })
+            .attr("r", function(d) { return d.amount })
             .style("fill", function(d) {
                 var returnColor;
                 if (d.category == "Food") { returnColor = "green"; }
                 else if (d.category == "Activities") { returnColor = "red"; }
                 return returnColor;
-            });
+            })
+            .text(function(d) { return "$" + d.amount; });
     </script>
 
 {% include 'partials/footer.html' %}
