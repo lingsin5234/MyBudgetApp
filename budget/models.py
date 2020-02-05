@@ -3,7 +3,9 @@ from django.db import models
 
 # Line Item Category
 class Category(models.Model):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=20)
+    colour = models.CharField(max_length=7, null=True, default=None)
 
     def __str__(self):
         return self.name
