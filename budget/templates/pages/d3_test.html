@@ -69,20 +69,22 @@
         var exp_list = JSON.parse('{{expenses|safe}}');
         var category = JSON.parse('{{category|safe}}');
         var svg = d3.select("body").append("svg")
-            .attr("width", exp_list.length*100).attr("height", exp_list.length*100);
+            .attr("width", exp_list.length*200).attr("height", exp_list.length*100);
         var bar_chart = svg.selectAll("g")
-            .data(exp_list).enter().append("g")
+            .data(exp_list).enter().append("g");
         var bar_attributes = bar_chart.append("rect")
             .attr("x", 10)
             .attr("y", function(d) { return (d.id-0.95)*100 })
             .attr("width", function(d) { return d.amount })
             .attr("height", 95)
-            .style("fill", function(d) { return category[d.category-1].colour; })
-        //var bar_text = bars
-            //.style("text-anchor", "end")
-            //.attr("dx", -.8em")
-            //.attr("dy", -.55em")
-        //var bar_text = bar_chart.append("text")
+            .style("fill", function(d) { return category[d.category-1].colour; });
+        var bar_text = bar_chart.append("text")
+            .style("text-anchor", "start")
+            .attr("x", function(d) { return d.amount + 20 })
+            .attr("y", function (d) { return (d.id-0.5)*100 })
+            .attr("font-family", "roboto")
+            .attr("font-size", "1em")
+            .attr("fill", "white")
             .text(function(d) { return "$" + d.amount; });
     </script>
 
