@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
-from .models import LineItem, Category, CreditCard, ExpenseLineItem
-from .forms import UploadLineItemForm, UploadCategoryForm, UploadCreditCardForm, UploadExpenseForm
+from .models import LineItem, ExpCategory, CreditCard, ExpenseLineItem
+from .models import RevCategory, BankAccount, RevenueLineItem
+from .forms import UploadLineItemForm, UploadExpCatForm, UploadCreditCardForm, UploadExpenseForm
+from .forms import UploadRevCatForm, UploadBankAccountForm, UploadRevenueForm
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 import json
@@ -84,7 +86,7 @@ def show_d3(request):
 
 def upload_data(request, upload_type):
     # default upload_name
-    upload_name = 'Expense'
+    upload_name = 'Expense Item'
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -94,9 +96,18 @@ def upload_data(request, upload_type):
         elif upload_type == 'credit_card':
             upload_name = 'Credit Card'
             form = UploadCreditCardForm(request.POST)
-        elif upload_type == 'category':
-            upload_name = 'Category'
-            form = UploadCategoryForm(request.POST)
+        elif upload_type == 'exp_category':
+            upload_name = 'Expense Category'
+            form = UploadExpCatForm(request.POST)
+        elif upload_type == 'revenue':
+            upload_name = 'Revenue Item'
+            form = UploadRevenueForm(request.POST)
+        elif upload_type == 'rev_category':
+            upload_name = 'Revenue Category'
+            form = UploadRevCatForm(request.POST)
+        elif upload_type == 'bank_account':
+            upload_name = 'Bank Account'
+            form = UploadBankAccountForm(request.POST)
         else:
             upload_name = 'Line Item'
             form = UploadLineItemForm(request.POST)
@@ -115,9 +126,18 @@ def upload_data(request, upload_type):
         elif upload_type == 'credit_card':
             upload_name = 'Credit Card'
             form = UploadCreditCardForm()
-        elif upload_type == 'category':
-            upload_name = 'Category'
-            form = UploadCategoryForm()
+        elif upload_type == 'exp_category':
+            upload_name = 'Expense Category'
+            form = UploadExpCatForm()
+        elif upload_type == 'revenue':
+            upload_name = 'Revenue Item'
+            form = UploadRevenueForm()
+        elif upload_type == 'rev_category':
+            upload_name = 'Revenue Category'
+            form = UploadRevCatForm()
+        elif upload_type == 'bank_account':
+            upload_name = 'Bank Account'
+            form = UploadBankAccountForm()
         else:
             upload_name = 'Line Item'
             form = UploadLineItemForm
@@ -133,14 +153,23 @@ def upload_data(request, upload_type):
 
 def upload_done(request, upload_type):
     if upload_type == 'expense':
-        upload_name = 'Expense'
+        upload_name = 'Expense Item'
         item = ExpenseLineItem.objects.latest('pk')
     elif upload_type == 'credit_card':
         upload_name = 'Credit Card'
         item = CreditCard.objects.latest('pk')
-    elif upload_type == 'Category':
+    elif upload_type == 'exp_category':
         upload_name = 'Category'
-        item = Category.objects.latest('pk')
+        item = ExpCategory.objects.latest('pk')
+    elif upload_type == 'revenue':
+        upload_name = 'Revenue Item'
+        item = RevenueLineItem.objects.latest('pk')
+    elif upload_type == 'rev_category':
+        upload_name = 'Revenue Category'
+        item = RevCategory.objects.latest('pk')
+    elif upload_type == 'bank_account':
+        upload_name = 'Bank Account'
+        item = BankAccount.objects.latest('pk')
     else:
         upload_name = 'Line Item'
         item = LineItem.objects.latest('pk')
