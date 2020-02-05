@@ -25,7 +25,7 @@ def show_d3(request):
 
     # serialize all LineItem objects and convert to json format
     items = ExpenseLineItem.objects.all()
-    category = Category.objects.all()
+    category = ExpCategory.objects.all()
     output = []
     cats = []
     for item in items:
