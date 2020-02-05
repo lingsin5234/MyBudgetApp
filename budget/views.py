@@ -126,8 +126,8 @@ def upload_data(request, upload_type):
 
 
 def upload_done(request, upload_type):
-    if upload_type == 'line_item':
-        upload_name = 'Line Item'
+    if upload_type == 'expense':
+        upload_name = 'Expense'
         item = ExpenseLineItem.objects.latest('pk')
     elif upload_type == 'credit_card':
         upload_name = 'Credit Card'

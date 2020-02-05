@@ -1,7 +1,7 @@
 from django.db import models
 
 
-# Line Item Category
+# Category
 class Category(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=20)
@@ -24,7 +24,8 @@ class LineItem(models.Model):
 
 # Credit Card
 class CreditCard(models.Model):
-    name = models.CharField(max_length=15)
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=15, null=True, blank=True, default=None)
 
     def __str__(self):
         return self.name
@@ -34,9 +35,9 @@ class CreditCard(models.Model):
 class ExpenseLineItem(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=30)
-    category = models.OneToOneField(Category, on_delete=models.SET_DEFAULT, default='Uncategorized')
+    category = models.ForeignKey(Category, on_delete=models.SET_DEFAULT, default='Uncategorized')
     pay_type = models.CharField(max_length=10)
-    card_name = models.OneToOneField(CreditCard, on_delete=models.SET_NULL, null=True, default=None)
+    card_name = models.ForeignKey(CreditCard, on_delete=models.SET_NULL, null=True, blank=True, default=None)
     date_stamp = models.DateField()
     amount = models.FloatField()
 
