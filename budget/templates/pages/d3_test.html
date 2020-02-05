@@ -76,13 +76,7 @@
             .attr("cx", function(d) { return 50 })
             .attr("cy", function(d) { return (d.id-0.5)*50 })
             .attr("r", function(d) { return d.amount/10 })
-            .style("fill", function(d) {
-                //var returnColour;
-                //returnColour = category[d.category].colour;
-                //return returnColour;
-                return category[d.category].colour;
-                //return "#329966";
-            })
+            .style("fill", function(d) { return category[d.category-1].colour; })
             .text(function(d) { return "$" + d.amount; });
     </script>
 
