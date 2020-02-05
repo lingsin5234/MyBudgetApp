@@ -66,12 +66,12 @@ def show_d3(request):
         }
     ]
     context = {
-        'line_items': json.dumps(output, cls=DjangoJSONEncoder),
+        'expenses': json.dumps(output, cls=DjangoJSONEncoder),
         'data': data,
         'json_data': json.dumps(json_data),
         # 'line_items': output,
-        'type': output[0],
-        'expenses': json.dumps(expenses)
+        'type': output[0]
+        # 'expenses': json.dumps(expenses)
     }
     return render(request, 'pages/d3_test.html', context)
 
