@@ -22,13 +22,18 @@ def show_data(request):
 def show_d3(request):
 
     # serialize all LineItem objects and convert to json format
-    items = LineItem.objects.all()
+    items = ExpenseLineItem.objects.all()
+    category = Category.objects.all()
     output = []
+    cats = []
     for item in items:
         add = model_to_dict(item)
         output.append(add)
         # output[i] = add
         # i += 1
+    for cat in category:
+        add = model_to_dict(cat)
+        cats.append(add)
     # output = json.dumps(items[:])
     data = [30, 65, 300]
     json_data = [
@@ -67,6 +72,7 @@ def show_d3(request):
     ]
     context = {
         'expenses': json.dumps(output, cls=DjangoJSONEncoder),
+        'category': json.dumps(cats),
         'data': data,
         'json_data': json.dumps(json_data),
         # 'line_items': output,
