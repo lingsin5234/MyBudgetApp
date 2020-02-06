@@ -123,6 +123,68 @@
             .attr("font-size", "0.7em")
             .attr("fill", "white")
             .text(function(d) { return "$" + d.amount; });
+        // graph to show
+        var show_graph = svg.append("rect")
+            .attr("x", 270).attr("width", 600)
+            .attr("y", 0.05*factor).attr("height", 600)
+            .style("fill", "#111111");
+    </script>
+
+    <script>
+        // get revenue line items
+        var revs = JSON.parse('{{revenue|safe}}');
+        // get max and min values
+        function get_min(revs) {
+            var min = 1000000;
+            for (i=0; i < revs.length; i++) {
+                if (min > revs[i].amount) {
+                    min = revs[i].amount
+                }
+            }
+            return min
+        };
+        var min_rev = get_min(revs);
+        function get_max(revs) {
+            var max = 0;
+            for (i=0; i < revs.length; i++) {
+                if (max < revs[i].amount) {
+                    max = revs[i].amount
+                }
+            }
+            return max
+        };
+        var max_rev = get_max(revs);
+        // set the dimensions and margins of the graph
+        var margin = {top: 10, right: 50, bottom: 30, left: 50},
+            width = 460 - margin.left - margin.right,
+            height = 400 - margin.top - margin.bottom;
+        // let's show a scatterplot first
+        var svg = d3.select("body").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform",
+                  "translate(" + margin.left + "," + margin.top + ")");
+        /*var print_text = svg.append("text")
+            .style("text-anchor", "middle")
+            .attr("x", 10).attr("y", 10)
+            .attr("font-family", "roboto")
+            .attr("font-size", "0.7em")
+            .attr("fill", "white")
+            .text(function(d) {return max_rev;});*/
+        // put X axis in date format
+        var x = d3.scaleLinear()
+          .domain([0,10])
+          .range([ 0, width ]);
+        svg.append("g")
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(x));
+        // add the Y axis
+        var y = d3.scaleLinear()
+          .domain( [min_rev,max_rev])
+          .range([ height, 0 ]);
+        svg.append("g")
+          .call(d3.axisLeft(y));
     </script>
 
 {% include 'partials/footer.html' %}
