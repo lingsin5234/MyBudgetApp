@@ -174,17 +174,23 @@
             .text(function(d) {return max_rev;});*/
         // put X axis in date format
         var x = d3.scaleLinear()
-          .domain([0,10])
-          .range([ 0, width ]);
+            .domain([0,10])
+            .range([ 0, width ]);
         svg.append("g")
-          .attr("transform", "translate(0," + height + ")")
-          .call(d3.axisBottom(x));
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
         // add the Y axis
         var y = d3.scaleLinear()
-          .domain( [min_rev,max_rev])
-          .range([ height, 0 ]);
+            .domain( [min_rev,max_rev])
+            .range([ height, 0 ]);
         svg.append("g")
-          .call(d3.axisLeft(y));
+            .call(d3.axisLeft(y));
+        // Initialize dots with group a
+        var dot = svg.selectAll('circle')
+            .data(revs).enter().append('circle')
+            .attr("cx", function(d) { return x(+d.id) })
+            .attr("cy", function(d) { return y(+d.amount) })
+            .attr("r", 4).style("fill", "#69b3a2")
     </script>
 
 {% include 'partials/footer.html' %}
