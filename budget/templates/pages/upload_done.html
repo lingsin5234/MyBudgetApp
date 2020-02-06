@@ -2,10 +2,12 @@
     <h1>Upload Completed</h1>
 
     <p>{{upload_name}} was uploaded:</p>
-    <ul>
-        {% for i in item.show_all %}
-        <li>{{i}}</li>
-        {% endfor %}
-    </ul>
+    <table>
+    {% for i in item.show_all %}
+        {% cycle '<tr>' '' %}
+            <td>{{ i }}</td>
+        {% cycle '' '</tr>' %}
+    {% endfor %}
+    </table>
 
 {% include 'partials/footer.html' %}
