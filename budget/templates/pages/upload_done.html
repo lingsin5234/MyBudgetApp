@@ -3,17 +3,9 @@
 
     <p>{{upload_name}} was uploaded:</p>
     <ul>
-        <!--li>{{item.name}}</li>
-
-        <li>{{item.category}}</li>
-        <li>{{item.date_stamp}}</li>
-        <li>{{item.amount}}</li>
-
-        <li>{{item.pay_type}}</li>
-        <li>{{item.card_name}}</li-->
-
-        <li>{{item.show_all}}</li>
-
+        {% for i in item.show_all %}
+        <li>{{i}}</li>
+        {% endfor %}
     </ul>
 
 {% include 'partials/footer.html' %}

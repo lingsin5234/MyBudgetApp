@@ -53,7 +53,10 @@ class BankAccount(models.Model):
         return self.nickname
 
     def show_all(self):
-        return [self.nickname, self.bank_name, self.account_type, self.balance]
+        return ["Nickname: " + self.nickname,
+                "Bank Name: " + str(self.bank_name),
+                "Account Type: " + self.account_type,
+                "Balance: $" + str(self.balance)]
 
 
 # Expenses Line Item
