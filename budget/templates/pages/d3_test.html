@@ -94,30 +94,33 @@
             .attr("width", 1000).attr("height", 1100);
         var dashboard = svg.selectAll("g")
             .data(bank_info).enter().append("g");
+        var factor = 70
+        // initial box
         var each_bank = dashboard.append("rect")
-            .attr("x", 10).attr("width", 750)
-            .attr("y", function(d) { return (d.id-0.95)*(1100/bank_info.length) })
-            .attr("height", 300)
+            .attr("x", 10).attr("width", 250)
+            .attr("y", function(d) { return (d.id-0.95)*factor })
+            .attr("height", 65)
             .style("fill", function(d) { return d.colour; });
         var bank_name = dashboard.append("text")
             .style("text-anchor", "middle")
-            .attr("x", 385)
-            .attr("y", function(d) { return (d.id-0.78)*(1100/bank_info.length) })
+            .attr("x", 135)
+            .attr("y", function(d) { return (d.id-0.6)*factor })
             .attr("font-family", "roboto")
-            .attr("font-size", "3em")
+            .attr("font-size", "1.25em")
             .attr("fill", "white")
             .text(function(d) { return d.name; });
+        // box for the amount
         var amount_box = dashboard.append("rect")
-            .attr("x", 60).attr("width", 650)
-            .attr("y", function(d) { return (d.id-0.6)*(1100/bank_info.length) })
-            .attr("height", 90)
+            .attr("x", 60).attr("width", 150)
+            .attr("y", function(d) { return (d.id-0.47)*factor })
+            .attr("height", 25)
             .style("fill", "#222222");
         var bank_amount = dashboard.append("text")
             .style("text-anchor", "middle")
-            .attr("x", 385)
-            .attr("y", function(d) { return (d.id-0.45)*(1100/bank_info.length) })
+            .attr("x", 135)
+            .attr("y", function(d) { return (d.id-0.25)*factor })
             .attr("font-family", "roboto")
-            .attr("font-size", "2em")
+            .attr("font-size", "0.7em")
             .attr("fill", "white")
             .text(function(d) { return "$" + d.amount; });
     </script>
