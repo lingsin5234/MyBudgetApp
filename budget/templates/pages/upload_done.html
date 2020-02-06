@@ -3,16 +3,17 @@
 
     <p>{{upload_name}} was uploaded:</p>
     <ul>
-        <li>{{item.name}}</li>
-        {% if upload_type == "line_item" or upload_type == "expense" %}
+        <!--li>{{item.name}}</li>
+
         <li>{{item.category}}</li>
         <li>{{item.date_stamp}}</li>
         <li>{{item.amount}}</li>
-        {% endif %}
-        {% if upload_type == "expense" %}
+
         <li>{{item.pay_type}}</li>
-        <li>{{item.card_name}}</li>
-        {% endif %}
+        <li>{{item.card_name}}</li-->
+
+        <li>{{item.show_all}}</li>
+
     </ul>
 
 {% include 'partials/footer.html' %}

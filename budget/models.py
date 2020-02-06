@@ -44,13 +44,16 @@ class CreditCard(models.Model):
 # Bank Account / Cash
 class BankAccount(models.Model):
     id = models.IntegerField(primary_key=True)
-    nickname = models.CharField(max_length=15)
+    nickname = models.CharField(max_length=15, unique=True)
     bank_name = models.CharField(max_length=15, null=True, blank=True, default=None)
     account_type = models.CharField(max_length=15)
     balance = models.FloatField()
 
     def __str__(self):
         return self.nickname
+
+    def show_all(self):
+        return [self.nickname, self.bank_name, self.account_type, self.balance]
 
 
 # Expenses Line Item
