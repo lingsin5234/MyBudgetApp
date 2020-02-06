@@ -99,7 +99,27 @@
             .attr("y", function(d) { return (d.id-0.95)*(1100/bank_info.length) })
             .attr("height", 300)
             .style("fill", function(d) { return d.colour; });
-        //var bank_name = 
+        var bank_name = dashboard.append("text")
+            .style("text-anchor", "middle")
+            .attr("x", 385)
+            .attr("y", function(d) { return (d.id-0.78)*(1100/bank_info.length) })
+            .attr("font-family", "roboto")
+            .attr("font-size", "3em")
+            .attr("fill", "white")
+            .text(function(d) { return d.name; });
+        var amount_box = dashboard.append("rect")
+            .attr("x", 60).attr("width", 650)
+            .attr("y", function(d) { return (d.id-0.6)*(1100/bank_info.length) })
+            .attr("height", 90)
+            .style("fill", "#222222");
+        var bank_amount = dashboard.append("text")
+            .style("text-anchor", "middle")
+            .attr("x", 385)
+            .attr("y", function(d) { return (d.id-0.45)*(1100/bank_info.length) })
+            .attr("font-family", "roboto")
+            .attr("font-size", "2em")
+            .attr("fill", "white")
+            .text(function(d) { return "$" + d.amount; });
     </script>
 
 {% include 'partials/footer.html' %}
