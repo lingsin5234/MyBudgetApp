@@ -10,6 +10,10 @@ class ExpCategory(models.Model):
     def __str__(self):
         return self.name
 
+    def show_all(self):
+        return ["Expense Category:", self.name,
+                "Colour:", self.colour]
+
 
 # Revenue Category
 class RevCategory(models.Model):
@@ -19,6 +23,10 @@ class RevCategory(models.Model):
 
     def __str__(self):
         return self.name
+
+    def show_all(self):
+        return ["Revenue Category:", self.name,
+                "Colour:", self.colour]
 
 
 # Line Item
@@ -31,14 +39,25 @@ class LineItem(models.Model):
     def __str__(self):
         return self.name
 
+    def show_all(self):
+        return ["Line Item:", self.name,
+                "Category:", self.category,
+                "Date:", str(self.date_stamp),
+                "Amount:", "$" + str(self.amount)]
+
 
 # Credit Card
 class CreditCard(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=15, null=True, blank=True, default=None)
+    colour = models.CharField(max_length=7, null=True, default=None)
 
     def __str__(self):
         return self.name
+
+    def show_all(self):
+        return ["Credit Card:", self.name,
+                "Colour:", self.colour]
 
 
 # Bank Account / Cash
@@ -72,6 +91,14 @@ class ExpenseLineItem(models.Model):
     def __str__(self):
         return self.name
 
+    def show_all(self):
+        return ["Expense:", self.name,
+                "Category:", self.category,
+                "Payment:", self.pay_type,
+                "Card Name:", self.card_name,
+                "Date:", str(self.date_stamp),
+                "Amount:", "$" + str(self.amount)]
+
 
 # Revenue Line Item
 class RevenueLineItem(models.Model):
@@ -85,3 +112,11 @@ class RevenueLineItem(models.Model):
 
     def __str__(self):
         return self.name
+
+    def show_all(self):
+        return ["Revenue:", self.name,
+                "Category:", self.category,
+                "Cash/Debit:", self.cash_debit,
+                "Bank Account:", self.bank_account,
+                "Date:", str(self.date_stamp),
+                "Amount:", "$" + str(self.amount)]
