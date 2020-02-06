@@ -64,7 +64,7 @@
             .text(function(d) { return d.name; });
     </script-->
 
-    <h3>Expenses Chart</h3>
+    <!--h3>Expenses Chart</h3>
     <script>
         var exp_list = JSON.parse('{{expenses|safe}}');
         var category = JSON.parse('{{category|safe}}');
@@ -86,6 +86,20 @@
             .attr("font-size", "1em")
             .attr("fill", "white")
             .text(function(d) { return "$" + d.amount; });
+    </script-->
+
+    <script>
+        var bank_info = JSON.parse('{{bank_info|safe}}');
+        var svg = d3.select("body").append("svg")
+            .attr("width", 1000).attr("height", 1100);
+        var dashboard = svg.selectAll("g")
+            .data(bank_info).enter().append("g");
+        var each_bank = dashboard.append("rect")
+            .attr("x", 10).attr("width", 750)
+            .attr("y", function(d) { return (d.id-0.95)*(1100/bank_info.length) })
+            .attr("height", 300)
+            .style("fill", function(d) { return d.colour; });
+        //var bank_name = 
     </script>
 
 {% include 'partials/footer.html' %}

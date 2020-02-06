@@ -72,9 +72,30 @@ def show_d3(request):
             "amount": 11.00
         }
     ]
+    bank_info = [
+        {
+            "id": 1,
+            "name": "Cash",
+            "colour": "#660066",
+            "amount": "50.00"
+        },
+        {
+            "id": 2,
+            "name": "RBC",
+            "colour": "#005daa",
+            "amount": "25000.00"
+        },
+        {
+            "id": 3,
+            "name": "Tangerine",
+            "colour": "#f28500",
+            "amount": "1700.00"
+        }
+    ]
     context = {
         'expenses': json.dumps(output, cls=DjangoJSONEncoder),
         'category': json.dumps(cats),
+        'bank_info': json.dumps(bank_info),
         'data': data,
         'json_data': json.dumps(json_data),
         # 'line_items': output,
