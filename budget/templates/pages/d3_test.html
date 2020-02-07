@@ -129,6 +129,7 @@
             .attr("y", function(d) { return (d.id-0.95)*factor })
             .attr("height", 65)
             .style("fill-opacity", 0)
+            .attr("class", "bank_account")
             .attr("id", function(d) { return d.name });
         // graph to show
         var graph_space = svg.append("svg")
@@ -211,9 +212,10 @@
                 .call(d3.axisBottom(x));
         }
 
-        // on click
-        d3.select("#Cash").on("click", function(d) {
-            updateChart("#Cash");
+        // on click - the class
+        d3.selectAll(".bank_account").on("click", function(d) {
+            var which_account = d3.select(this).property("id");
+            updateChart(which_account);
         })
     </script>
 
