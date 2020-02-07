@@ -137,8 +137,9 @@
             .attr("y", 0.05*factor).attr("height", 600);
         var show_graph = graph_space.append("g");
 
-        // get revenue line items
+        // get revenue & expense line items
         var revs = JSON.parse('{{revenue|safe}}');
+        var exps = JSON.parse('{{expense|safe}}');
         // get max and min values
         function get_min(revs) {
             var min = 1000000;
@@ -197,8 +198,9 @@
         // update function
         function updateChart(whichAccount) {
 
-            // get the correct data set, this will return as list of dict(s)
-            data = bank_info.filter(obj => obj.name === whichAccount)
+            // get the correct data sets, this will return as list of dict(s)
+            data = revs.filter(obj => obj.name === whichAccount)
+
 
             // get min and max values again
             var min_rev = get_min(data);
