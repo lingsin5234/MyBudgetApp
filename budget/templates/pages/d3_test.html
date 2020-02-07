@@ -123,6 +123,13 @@
             .attr("font-size", "0.7em")
             .attr("fill", "white")
             .text(function(d) { return "$" + d.amount; });
+        // put a clickable box on top - but transparent
+        var click_box = dashboard.append("rect")
+            .attr("x", 10).attr("width", 250)
+            .attr("y", function(d) { return (d.id-0.95)*factor })
+            .attr("height", 65)
+            .style("fill-opacity", 0)
+            .attr("id", function(d) { return d.name });
         // graph to show
         var show_graph = svg.append("rect")
             .attr("x", 270).attr("width", 600)
@@ -138,20 +145,20 @@
             var min = 1000000;
             for (i=0; i < revs.length; i++) {
                 if (min > revs[i].amount) {
-                    min = revs[i].amount
+                    min = revs[i].amount;
                 }
             }
-            return min
+            return min;
         };
         var min_rev = get_min(revs);
         function get_max(revs) {
             var max = 0;
             for (i=0; i < revs.length; i++) {
                 if (max < revs[i].amount) {
-                    max = revs[i].amount
+                    max = revs[i].amount;
                 }
             }
-            return max
+            return max;
         };
         var max_rev = get_max(revs);
         // set the dimensions and margins of the graph
@@ -165,25 +172,27 @@
             .append("g")
             .attr("transform",
                   "translate(" + margin.left + "," + margin.top + ")");
-        /*var print_text = svg.append("text")
+        var print_text = svg.append("text")
             .style("text-anchor", "middle")
             .attr("x", 10).attr("y", 10)
             .attr("font-family", "roboto")
             .attr("font-size", "0.7em")
             .attr("fill", "white")
-            .text(function(d) {return max_rev;});*/
+            .text(function(d) {return max_rev;});
         // put X axis in date format
         var x = d3.scaleLinear()
             .domain([0,10])
             .range([ 0, width ]);
         svg.append("g")
             .attr("transform", "translate(0," + height + ")")
+            .attr("class", "x_axis")
             .call(d3.axisBottom(x));
         // add the Y axis
         var y = d3.scaleLinear()
             .domain([ min_rev,max_rev ])
             .range([ height, 0 ]);
         svg.append("g")
+            .attr("class", "y_axis")
             .call(d3.axisLeft(y));
         // Initialize dots with group a
         var dot = svg.selectAll('circle')
@@ -193,20 +202,27 @@
             .attr("r", 4).style("fill", "#2f7fef");
 
         // update function
-        function update(selectAccount) {
+        function updateChart(selectAccount) {
 
             // get the correct data set
             // data = ??
 
+            // print text to check
+            print_text
+                .text(function(d) {return 6000;});
+
             // reset the Y and X axis
             x
-                .transition()
-                .duration(1000)  // 1000 ms
-                .domain([0, 100])
-                .range([ 0, width*2 ])
+                .domain([0, 100]);
+            svg.selectAll("g.x_axis")
+                .transition().duration(1000)
+                .call(d3.axisBottom(x));
         }
 
-        
+        // on click
+        d3.select("#Cash").on("click", function(d) {
+            updateChart("#Cash");
+        })
     </script>
 
 {% include 'partials/footer.html' %}
