@@ -120,3 +120,18 @@ class RevenueLineItem(models.Model):
                 "Bank Account:", self.bank_account,
                 "Date:", str(self.date_stamp),
                 "Amount:", "$" + str(self.amount)]
+
+
+# Bank Account Transactional Items
+class BankLineItem(models.Model):
+    id = models.IntegerField(primary_key=True)
+    amount = models.FloatField()
+    from_transaction = models.ForeignKey(BankAccount, null=True, blank=True,
+                                         on_delete=models.SET_NULL, related_name='_unused_1')
+    to_transaction = models.ForeignKey(BankAccount, null=True, blank=True,
+                                       on_delete=models.SET_NULL, related_name='_unused_2')
+    date_stamp = models.DateField()
+
+    def __str__(self):
+        return "From " + self.from_transaction + " To " + self.to_transaction + ": $" + self.amount + \
+               " on " + self.date_stamp + ". "
