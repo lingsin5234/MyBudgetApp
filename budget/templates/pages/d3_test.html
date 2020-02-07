@@ -91,7 +91,7 @@
     <script>
         var bank_info = JSON.parse('{{bank_info|safe}}');
         var svg = d3.select("body").append("svg")
-            .attr("width", 1000).attr("height", 1100);
+            .attr("width", 1100).attr("height", 1100);
         var dashboard = svg.selectAll("g")
             .data(bank_info).enter().append("g");
         var factor = 70
@@ -131,13 +131,11 @@
             .style("fill-opacity", 0)
             .attr("id", function(d) { return d.name });
         // graph to show
-        var show_graph = svg.append("rect")
-            .attr("x", 270).attr("width", 600)
-            .attr("y", 0.05*factor).attr("height", 600)
-            .style("fill", "#111111");
-    </script>
+        var graph_space = svg.append("svg")
+            .attr("x", 300).attr("width", 700)
+            .attr("y", 0.05*factor).attr("height", 600);
+        var show_graph = graph_space.append("g");
 
-    <script>
         // get revenue line items
         var revs = JSON.parse('{{revenue|safe}}');
         // get max and min values
@@ -163,16 +161,9 @@
         var max_rev = get_max(revs);
         // set the dimensions and margins of the graph
         var margin = {top: 10, right: 50, bottom: 30, left: 50},
-            width = 460 - margin.left - margin.right,
-            height = 400 - margin.top - margin.bottom;
-        // let's show a scatterplot first
-        var svg = d3.select("body").append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform",
-                  "translate(" + margin.left + "," + margin.top + ")");
-        var print_text = svg.append("text")
+            width = 600 - margin.left - margin.right,
+            height = 600 - margin.top - margin.bottom;
+        var print_text = show_graph.append("text")
             .style("text-anchor", "middle")
             .attr("x", 10).attr("y", 10)
             .attr("font-family", "roboto")
@@ -183,21 +174,22 @@
         var x = d3.scaleLinear()
             .domain([0,10])
             .range([ 0, width ]);
-        svg.append("g")
-            .attr("transform", "translate(0," + height + ")")
+        show_graph.append("g")
+            .attr("transform", "translate(50," + height + ")")
             .attr("class", "x_axis")
             .call(d3.axisBottom(x));
         // add the Y axis
         var y = d3.scaleLinear()
             .domain([ min_rev,max_rev ])
             .range([ height, 0 ]);
-        svg.append("g")
+        show_graph.append("g")
+            .attr("transform", "translate(50, 0)")
             .attr("class", "y_axis")
             .call(d3.axisLeft(y));
         // Initialize dots with group a
-        var dot = svg.selectAll('circle')
+        var dot = show_graph.selectAll('circle')
             .data(revs).enter().append('circle')
-            .attr("cx", function(d) { return x(+d.id) })
+            .attr("cx", function(d) { return x(+d.id)+50 })
             .attr("cy", function(d) { return y(+d.amount) })
             .attr("r", 4).style("fill", "#2f7fef");
 
@@ -214,7 +206,7 @@
             // reset the Y and X axis
             x
                 .domain([0, 100]);
-            svg.selectAll("g.x_axis")
+            show_graph.selectAll("g.x_axis")
                 .transition().duration(1000)
                 .call(d3.axisBottom(x));
         }
