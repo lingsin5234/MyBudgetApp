@@ -197,12 +197,16 @@
         // update function
         function updateChart(whichAccount) {
 
-            // get the correct data set
+            // get the correct data set, this will return as list of dict(s)
             data = bank_info.filter(obj => obj.name === whichAccount)
+
+            // get min and max values again
+            var min_rev = get_min(data);
+            var max_rev = get_max(data);
 
             // print text to check
             print_text
-                .text(function(d) {return data[0].name;});
+                .text(function(d) {return min_rev;});
 
             // reset the Y and X axis
             x
