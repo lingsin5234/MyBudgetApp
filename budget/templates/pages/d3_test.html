@@ -181,7 +181,7 @@
             .call(d3.axisBottom(x));
         // add the Y axis
         var y = d3.scaleLinear()
-            .domain( [min_rev,max_rev])
+            .domain([ min_rev,max_rev ])
             .range([ height, 0 ]);
         svg.append("g")
             .call(d3.axisLeft(y));
@@ -190,7 +190,23 @@
             .data(revs).enter().append('circle')
             .attr("cx", function(d) { return x(+d.id) })
             .attr("cy", function(d) { return y(+d.amount) })
-            .attr("r", 4).style("fill", "#69b3a2")
+            .attr("r", 4).style("fill", "#2f7fef");
+
+        // update function
+        function update(selectAccount) {
+
+            // get the correct data set
+            // data = ??
+
+            // reset the Y and X axis
+            x
+                .transition()
+                .duration(1000)  // 1000 ms
+                .domain([0, 100])
+                .range([ 0, width*2 ])
+        }
+
+        
     </script>
 
 {% include 'partials/footer.html' %}
