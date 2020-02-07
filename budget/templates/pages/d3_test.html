@@ -195,14 +195,14 @@
             .attr("r", 4).style("fill", "#2f7fef");
 
         // update function
-        function updateChart(selectAccount) {
+        function updateChart(whichAccount) {
 
             // get the correct data set
-            // data = ??
+            data = bank_info.filter(obj => obj.name === whichAccount)
 
             // print text to check
             print_text
-                .text(function(d) {return 6000;});
+                .text(function(d) {return data[0].name;});
 
             // reset the Y and X axis
             x
