@@ -9,7 +9,7 @@ from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 from django.forms.models import model_to_dict
-from .functions import get_exp_data, get_rev_data, update_bank
+from .functions import get_exp_data, get_rev_data, update_bank_rev
 
 
 # line item test view
@@ -167,7 +167,7 @@ def upload_data(request, upload_type):
 
                 if form2.is_valid():
                     # proceed to edit the bank accounts!
-                    update_bank(rev_data)
+                    update_bank_rev(rev_data)
                     form2.save()
                 else:
                     HttpResponse('<h1>Bank Line Item Form error</h1>')

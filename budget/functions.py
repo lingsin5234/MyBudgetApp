@@ -47,12 +47,32 @@ def get_exp_data(post_data):
 
 
 # update the bank accounts based the bank line item!
-def update_bank(data):
+def update_bank_rev(data):
+    cash = BankAccount.objects.get(nickname="Cash")
 
-    # actual revenue item
-    if data['from_transaction'] == '':
+    # from Cash to Bank ==> a deposit
+    if data['from_transaction'] == str(cash.id) and not(data['to_transaction'] == ''):
+        bank = BankAccount.objects.get(id=int(data['to_transaction']))
+        bank.balance += float(data['amount'])
+        cash.balance -= float(data['amount'])
+        bank.save()
+        cash.save()
+
+    # from Bank to Cash ==> a Withdrawal
+    elif not(data['from_transaction'] == '') and data['to_transaction'] == str(cash.id):
+        bank = BankAccount.objects.get(id=int(data['from_transaction']))
+        bank.balance -= float(data['amount'])
+        bank.save()
+
+    # from '' to Cash ==> cash received
+    elif data['from_transaction'] == '' and data['to_transaction'] == str(cash.id):
+        cash.balance += float(data['amount'])
+        cash.save()
+
+    # actual revenue item to bank account
+    else:
         bank = BankAccount.objects.get(id=int(data['to_transaction']))
         bank.balance += float(data['amount'])
         bank.save()
-
+        
     return
