@@ -1,6 +1,6 @@
 from django import forms
 from .models import LineItem, ExpCategory, CreditCard, ExpenseLineItem
-from .models import RevCategory, BankAccount, RevenueLineItem
+from .models import RevCategory, BankAccount, RevenueLineItem, BankLineItem
 
 
 class UploadLineItemForm(forms.ModelForm):
@@ -43,3 +43,9 @@ class UploadRevenueForm(forms.ModelForm):
     class Meta:
         model = RevenueLineItem
         fields = ['name', 'category', 'cash_debit', 'bank_account', 'date_stamp', 'amount']
+
+
+class UploadBankLineItemForm(forms.ModelForm):
+    class Meta:
+        model = BankLineItem
+        fields = ['amount', 'from_transaction', 'to_transaction', 'date_stamp']

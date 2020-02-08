@@ -133,5 +133,5 @@ class BankLineItem(models.Model):
     date_stamp = models.DateField()
 
     def __str__(self):
-        return "From " + self.from_transaction + " To " + self.to_transaction + ": $" + self.amount + \
-               " on " + self.date_stamp + ". "
+        return "From " + str(self.from_transaction) + " To " + str(self.to_transaction) + ": $" + str(self.amount) + \
+               " on " + str(self.date_stamp) + ". "

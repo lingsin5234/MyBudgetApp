@@ -1,9 +1,9 @@
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from .models import LineItem, ExpCategory, CreditCard, ExpenseLineItem
 from .models import RevCategory, BankAccount, RevenueLineItem
 from .forms import UploadLineItemForm, UploadExpCatForm, UploadCreditCardForm, UploadExpenseForm
-from .forms import UploadRevCatForm, UploadBankAccountForm, UploadRevenueForm
+from .forms import UploadRevCatForm, UploadBankAccountForm, UploadRevenueForm, UploadBankLineItemForm
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 import json
@@ -112,6 +112,16 @@ def show_d3(request):
     return render(request, 'pages/d3_test.html', context)
 
 
+def get_rev_data(post_data):
+    rev_data = {
+        'amount': post_data['amount'],
+        'from_transaction': '',
+        'to_transaction': post_data['bank_account'],
+        'date_stamp': post_data['date_stamp']
+    }
+    return rev_data
+
+
 def upload_data(request, upload_type):
     # default upload_name
     upload_name = 'Expense Item'
@@ -142,7 +152,24 @@ def upload_data(request, upload_type):
 
         # check whether it's valid:
         if form.is_valid():
-            # process the data in form.cleaned_data as required
+
+            # check if it's expense or revenue line item
+            if upload_type == 'expense':
+                # expense then get expenses then submit bank form
+                form2 = UploadBankLineItemForm(request.POST)
+
+                if form2.is_valid():
+                    form2.save()
+            elif upload_type == 'revenue':
+                # revenue then get rev data then submit bank form
+                rev_data = get_rev_data(request.POST)
+                form2 = UploadBankLineItemForm(rev_data)
+
+                if form2.is_valid():
+                    form2.save()
+                else:
+                    HttpResponse('<h1>Bank Line Item Form error</h1>')
+            # still need to save the first form
             form.save()
             # redirect to a new URL:
             return HttpResponseRedirect('/upload_done/' + upload_type + '/')
