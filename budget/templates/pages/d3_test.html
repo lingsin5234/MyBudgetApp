@@ -177,7 +177,7 @@
             .domain([0,10])
             .range([ 0, width ]);
         show_graph.append("g")
-            .attr("transform", "translate(50," + height + ")")
+            .attr("transform", "translate(50," + (height+10) + ")")
             .attr("class", "x_axis")
             .call(d3.axisBottom(x));
         // add the Y axis
@@ -185,14 +185,14 @@
             .domain([ min_rev,max_rev ])
             .range([ height, 0 ]);
         show_graph.append("g")
-            .attr("transform", "translate(50, 0)")
+            .attr("transform", "translate(50, 10)")
             .attr("class", "y_axis")
             .call(d3.axisLeft(y));
         // Initialize dots with group a
         var dot = show_graph.selectAll('circle')
             .data(revs).enter().append('circle')
             .attr("cx", function(d) { return x(+d.id)+50 })
-            .attr("cy", function(d) { return y(+d.amount) })
+            .attr("cy", function(d) { return y(+d.amount)+10 })
             .attr("r", 4).style("fill", "#2f7fef");
 
         // update function
