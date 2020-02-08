@@ -167,9 +167,9 @@
             height = 600 - margin.top - margin.bottom;
         var print_text = show_graph.append("text")
             .style("text-anchor", "middle")
-            .attr("x", 10).attr("y", 10)
+            .attr("x", 250).attr("y", 50)
             .attr("font-family", "roboto")
-            .attr("font-size", "0.7em")
+            .attr("font-size", "1em")
             .attr("fill", "white")
             .text(function(d) {return max_rev;});
         // put X axis in date format
@@ -199,7 +199,7 @@
         function updateChart(whichAccount) {
 
             // get the correct data sets, this will return as list of dict(s)
-            data = revs.filter(obj => obj.name === whichAccount)
+            data = bank_info.filter(obj => obj.name === whichAccount)
 
 
             // get min and max values again

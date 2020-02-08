@@ -99,7 +99,7 @@ def show_d3(request):
         revs.append(add)
 
     context = {
-        'expenses': json.dumps(output, cls=DjangoJSONEncoder),
+        'expense': json.dumps(output, cls=DjangoJSONEncoder),
         'category': json.dumps(cats),
         'revenue': json.dumps(revs, cls=DjangoJSONEncoder),
         'bank_info': json.dumps(bank_info),
