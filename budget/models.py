@@ -76,6 +76,7 @@ class BankAccount(models.Model):
     bank_name = models.CharField(max_length=15, null=True, blank=True, default=None)
     account_type = models.CharField(max_length=15)
     balance = models.FloatField()
+    colour = models.CharField(max_length=7, default='#FFFFFF')
 
     def __str__(self):
         return self.nickname
@@ -84,7 +85,8 @@ class BankAccount(models.Model):
         return ["Nickname:", self.nickname,
                 "Bank Name:", str(self.bank_name),
                 "Account Type:", self.account_type,
-                "Balance:", "$" + str(self.balance)]
+                "Balance:", "$" + str(self.balance),
+                "Colour:", self.colour]
 
 
 # Expenses Line Item

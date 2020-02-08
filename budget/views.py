@@ -29,9 +29,11 @@ def show_d3(request):
     items = ExpenseLineItem.objects.all()
     category = ExpCategory.objects.all()
     revenue = RevenueLineItem.objects.all()
+    bank = BankAccount.objects.all()
     output = []
     cats = []
     revs = []
+    banks = []
     for item in items:
         add = model_to_dict(item)
         output.append(add)
@@ -99,12 +101,16 @@ def show_d3(request):
     for rev in revenue:
         add = model_to_dict(rev)
         revs.append(add)
+    for b in bank:
+        add = model_to_dict(b)
+        banks.append(add)
 
     context = {
         'expense': json.dumps(output, cls=DjangoJSONEncoder),
         'category': json.dumps(cats),
         'revenue': json.dumps(revs, cls=DjangoJSONEncoder),
-        'bank_info': json.dumps(bank_info),
+        # 'bank_info': json.dumps(bank_info),
+        'bank_info': json.dumps(banks),
         'data': data,
         'json_data': json.dumps(json_data),
         # 'line_items': output,

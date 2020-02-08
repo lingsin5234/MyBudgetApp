@@ -74,5 +74,5 @@ def update_bank_rev(data):
         bank = BankAccount.objects.get(id=int(data['to_transaction']))
         bank.balance += float(data['amount'])
         bank.save()
-        
+
     return
