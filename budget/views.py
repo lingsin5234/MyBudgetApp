@@ -112,6 +112,7 @@ def show_d3(request):
     return render(request, 'pages/d3_test.html', context)
 
 
+# get bank line item form data from the revenue line item input
 def get_rev_data(post_data):
     rev_data = {
         'amount': post_data['amount'],
@@ -120,6 +121,17 @@ def get_rev_data(post_data):
         'date_stamp': post_data['date_stamp']
     }
     return rev_data
+
+
+# get bank line item form data from the expense line item input
+def get_exp_data(post_data):
+    exp_data = {
+        'amount': post_data['amount'],
+        'from_transaction': '',
+        'to_transaction': post_data['credit_card'],
+        'date_stamp': post_data['date_stamp']
+    }
+    return exp_data
 
 
 def upload_data(request, upload_type):
@@ -156,10 +168,13 @@ def upload_data(request, upload_type):
             # check if it's expense or revenue line item
             if upload_type == 'expense':
                 # expense then get expenses then submit bank form
-                form2 = UploadBankLineItemForm(request.POST)
+                exp_data = get_exp_data(request.POST)
+                form2 = UploadBankLineItemForm(exp_data)
 
                 if form2.is_valid():
                     form2.save()
+                else:
+                    HttpResponse('<h1>Bank Line Item Form error</h1>')
             elif upload_type == 'revenue':
                 # revenue then get rev data then submit bank form
                 rev_data = get_rev_data(request.POST)
