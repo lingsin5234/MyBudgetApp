@@ -9,7 +9,7 @@ from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 from django.forms.models import model_to_dict
-from .functions import get_exp_data, get_rev_data, update_bank_rev
+from .functions import get_exp_data, get_rev_data, update_bank_rev, credit_card_payment
 
 
 # line item test view
@@ -177,6 +177,8 @@ def upload_data(request, upload_type):
                     form2.save()
                 else:
                     HttpResponse('<h1>Bank Line Item Form error</h1>')
+            elif upload_type == 'pay_cc':
+                credit_card_payment(request.POST)
             # still need to save the first form
             form.save()
             # redirect to a new URL:

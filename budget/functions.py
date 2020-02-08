@@ -1,5 +1,5 @@
 # custom functions listed in this file
-from .models import BankAccount, RevCategory
+from .models import BankAccount, RevCategory, CreditCard
 
 
 # get bank line item form data from the revenue line item input
@@ -85,4 +85,15 @@ def update_bank_rev(data):
         bank1.save()
         bank2.save()
 
+    return
+
+
+# credit card payment - both are -=
+def credit_card_payment(data):
+    bank = BankAccount.objects.get(id=int(data['from_bank']))
+    cc = CreditCard.objects.get(id=int(data['to_credit_card']))
+    bank.balance -= float(data['amount'])
+    cc.balance -= float(data['amount'])
+    bank.save()
+    cc.save()
     return
