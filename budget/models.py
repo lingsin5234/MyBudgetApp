@@ -142,4 +142,17 @@ class BankLineItem(models.Model):
 
     def __str__(self):
         return "From " + str(self.from_transaction) + " To " + str(self.to_transaction) + ": $" + str(self.amount) + \
-               " on " + str(self.date_stamp) + ". "
+               " on " + str(self.date_stamp) + "."
+
+
+# Credit Card Payment
+class CreditCardPayment(models.Model):
+    id = models.IntegerField(primary_key=True)
+    amount = models.FloatField()
+    from_bank = models.ForeignKey(BankAccount, on_delete=models.SET_DEFAULT, default='Defunct')
+    to_credit_card = models.ForeignKey(CreditCard, on_delete=models.SET_DEFAULT, default='Defunct')
+    date_stamp = models.DateField()
+
+    def __str__(self):
+        return "From " + str(self.from_bank) + " To " + str(self.to_credit_card) + ": $" + str(self.amount) + \
+               " on " + str(self.date_stamp) + "."

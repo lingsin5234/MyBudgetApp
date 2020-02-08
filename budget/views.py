@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from .models import LineItem, ExpCategory, CreditCard, ExpenseLineItem
-from .models import RevCategory, BankAccount, RevenueLineItem
+from .models import RevCategory, BankAccount, RevenueLineItem, CreditCardPayment
 from .forms import UploadLineItemForm, UploadExpCatForm, UploadCreditCardForm, UploadExpenseForm
 from .forms import UploadRevCatForm, UploadBankAccountForm, UploadRevenueForm, UploadBankLineItemForm
+from .forms import UploadCreditCardPaymentForm
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 import json
@@ -180,6 +181,9 @@ def upload_data(request, upload_type):
         elif upload_type == 'bank_account':
             upload_name = 'Bank Account'
             form = UploadBankAccountForm(request.POST)
+        elif upload_type == 'pay_cc':
+            upload_name = 'Credit Card Payment'
+            form = UploadCreditCardPaymentForm(request.POST)
         else:
             upload_name = 'Line Item'
             form = UploadLineItemForm(request.POST)
@@ -231,6 +235,9 @@ def upload_data(request, upload_type):
         elif upload_type == 'bank_account':
             upload_name = 'Bank Account'
             form = UploadBankAccountForm()
+        elif upload_type == 'pay_cc':
+            upload_name = 'Credit Card Payment'
+            form = UploadCreditCardPaymentForm()
         else:
             upload_name = 'Line Item'
             form = UploadLineItemForm
@@ -263,6 +270,9 @@ def upload_done(request, upload_type):
     elif upload_type == 'bank_account':
         upload_name = 'Bank Account'
         item = BankAccount.objects.latest('pk')
+    elif upload_type == 'pay_cc':
+        upload_name = 'Credit Card Payment'
+        item = CreditCardPayment.objects.latest('pk')
     else:
         upload_name = 'Line Item'
         item = LineItem.objects.latest('pk')
