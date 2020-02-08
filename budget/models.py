@@ -1,6 +1,14 @@
 from django.db import models
 
 
+# CHOICES
+CASH_DEBIT = [('cash', 'cash'),
+              ('debit', 'debit')]
+PAY_TYPE = [('cash', 'cash'),
+            ('debit', 'debit'),
+            ('credit', 'credit')]
+
+
 # Expense Category
 class ExpCategory(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -83,7 +91,7 @@ class ExpenseLineItem(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=30)
     category = models.ForeignKey(ExpCategory, on_delete=models.SET_DEFAULT, default='Uncategorized')
-    pay_type = models.CharField(max_length=10)
+    pay_type = models.CharField(max_length=6, choices=PAY_TYPE)
     card_name = models.ForeignKey(CreditCard, on_delete=models.SET_NULL, null=True, blank=True, default=None)
     date_stamp = models.DateField()
     amount = models.FloatField()
@@ -105,7 +113,7 @@ class RevenueLineItem(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=30)
     category = models.ForeignKey(RevCategory, on_delete=models.SET_DEFAULT, default='Uncategorized')
-    cash_debit = models.CharField(max_length=10)
+    cash_debit = models.CharField(max_length=5, choices=CASH_DEBIT)
     bank_account = models.ForeignKey(BankAccount, on_delete=models.SET_DEFAULT, default='Missing Bank')
     date_stamp = models.DateField()
     amount = models.FloatField()
