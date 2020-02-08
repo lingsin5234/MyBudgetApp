@@ -114,12 +114,34 @@ def show_d3(request):
 
 # get bank line item form data from the revenue line item input
 def get_rev_data(post_data):
-    rev_data = {
-        'amount': post_data['amount'],
-        'from_transaction': '',
-        'to_transaction': post_data['bank_account'],
-        'date_stamp': post_data['date_stamp']
-    }
+    # get some objects to input correct reference
+    withdrawal = RevCategory.objects.get(name="Withdrawal")
+    deposit = RevCategory.objects.get(name="Deposit")
+    cash = BankAccount.objects.get(nickname="Cash")
+
+    # if Withdrawal:
+    if post_data['category'] == str(withdrawal.id):
+        rev_data = {
+            'amount': post_data['amount'],
+            'from_transaction': post_data['bank_account'],
+            'to_transaction': str(cash.id),
+            'date_stamp': post_data['date_stamp']
+        }
+    # if Deposit:
+    elif post_data['category'] == str(deposit.id):
+        rev_data = {
+            'amount': post_data['amount'],
+            'from_transaction': str(cash.id),
+            'to_transaction': post_data['bank_account'],
+            'date_stamp': post_data['date_stamp']
+        }
+    else:
+        rev_data = {
+            'amount': post_data['amount'],
+            'from_transaction': '',
+            'to_transaction': post_data['bank_account'],
+            'date_stamp': post_data['date_stamp']
+        }
     return rev_data
 
 
@@ -178,6 +200,7 @@ def upload_data(request, upload_type):
             elif upload_type == 'revenue':
                 # revenue then get rev data then submit bank form
                 rev_data = get_rev_data(request.POST)
+                # return HttpResponse('<p>' + str(rev_data) + '</p><p>' + request.POST['category'] + '</p>')
                 form2 = UploadBankLineItemForm(rev_data)
 
                 if form2.is_valid():
