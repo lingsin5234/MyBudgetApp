@@ -25,7 +25,7 @@ def show_data(request):
 # d3.js test view
 def show_d3(request):
 
-    # serialize all LineItem objects and convert to json format
+    # convert all objects from dict_to_model
     items = ExpenseLineItem.objects.all()
     category = ExpCategory.objects.all()
     revenue = RevenueLineItem.objects.all()
