@@ -9,6 +9,7 @@ from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 from django.forms.models import model_to_dict
+from .functions import get_exp_data, get_rev_data, update_bank
 
 
 # line item test view
@@ -113,50 +114,7 @@ def show_d3(request):
     return render(request, 'pages/d3_test.html', context)
 
 
-# get bank line item form data from the revenue line item input
-def get_rev_data(post_data):
-    # get some objects to input correct reference
-    withdrawal = RevCategory.objects.get(name="Withdrawal")
-    deposit = RevCategory.objects.get(name="Deposit")
-    cash = BankAccount.objects.get(nickname="Cash")
-
-    # if Withdrawal:
-    if post_data['category'] == str(withdrawal.id):
-        rev_data = {
-            'amount': post_data['amount'],
-            'from_transaction': post_data['bank_account'],
-            'to_transaction': str(cash.id),
-            'date_stamp': post_data['date_stamp']
-        }
-    # if Deposit:
-    elif post_data['category'] == str(deposit.id):
-        rev_data = {
-            'amount': post_data['amount'],
-            'from_transaction': str(cash.id),
-            'to_transaction': post_data['bank_account'],
-            'date_stamp': post_data['date_stamp']
-        }
-    else:
-        rev_data = {
-            'amount': post_data['amount'],
-            'from_transaction': '',
-            'to_transaction': post_data['bank_account'],
-            'date_stamp': post_data['date_stamp']
-        }
-    return rev_data
-
-
-# get bank line item form data from the expense line item input
-def get_exp_data(post_data):
-    exp_data = {
-        'amount': post_data['amount'],
-        'from_transaction': '',
-        'to_transaction': post_data['credit_card'],
-        'date_stamp': post_data['date_stamp']
-    }
-    return exp_data
-
-
+# main function to upload latest line items/categories/accounts
 def upload_data(request, upload_type):
     # default upload_name
     upload_name = 'Expense Item'
@@ -208,6 +166,8 @@ def upload_data(request, upload_type):
                 form2 = UploadBankLineItemForm(rev_data)
 
                 if form2.is_valid():
+                    # proceed to edit the bank accounts!
+                    update_bank(rev_data)
                     form2.save()
                 else:
                     HttpResponse('<h1>Bank Line Item Form error</h1>')
