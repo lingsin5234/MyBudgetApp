@@ -53,15 +53,16 @@ def update_bank_rev(data):
     # from Cash to Bank ==> a deposit
     if data['from_transaction'] == str(cash.id) and not(data['to_transaction'] == ''):
         bank = BankAccount.objects.get(id=int(data['to_transaction']))
-        bank.balance += float(data['amount'])
         cash.balance -= float(data['amount'])
-        bank.save()
+        bank.balance += float(data['amount'])
         cash.save()
+        bank.save()
 
     # from Bank to Cash ==> a Withdrawal
     elif not(data['from_transaction'] == '') and data['to_transaction'] == str(cash.id):
         bank = BankAccount.objects.get(id=int(data['from_transaction']))
         bank.balance -= float(data['amount'])
+        cash.balance += float(data['amount'])
         bank.save()
 
     # from '' to Cash ==> cash received
@@ -69,10 +70,19 @@ def update_bank_rev(data):
         cash.balance += float(data['amount'])
         cash.save()
 
-    # actual revenue item to bank account
-    else:
+    # from '' to Bank ==> revenue received
+    elif data['from_transaction'] == '' and not(data['to_transaction'] == ''):
         bank = BankAccount.objects.get(id=int(data['to_transaction']))
         bank.balance += float(data['amount'])
         bank.save()
+
+    # transfer between bank accounts
+    else:
+        bank1 = BankAccount.objects.get(id=int(data['from_transaction']))
+        bank2 = BankAccount.objects.get(id=int(data['to_transaction']))
+        bank1.balance -= float(data['amount'])
+        bank2.balance += float(data['amount'])
+        bank1.save()
+        bank2.save()
 
     return
