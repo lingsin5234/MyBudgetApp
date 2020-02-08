@@ -149,10 +149,16 @@ class BankLineItem(models.Model):
 class CreditCardPayment(models.Model):
     id = models.IntegerField(primary_key=True)
     amount = models.FloatField()
-    from_bank = models.ForeignKey(BankAccount, on_delete=models.SET_DEFAULT, default='Defunct')
-    to_credit_card = models.ForeignKey(CreditCard, on_delete=models.SET_DEFAULT, default='Defunct')
+    from_bank = models.ForeignKey(BankAccount, on_delete=models.SET_DEFAULT, default='_defunct_acct')
+    to_credit_card = models.ForeignKey(CreditCard, on_delete=models.SET_DEFAULT, default='_defunct_cc')
     date_stamp = models.DateField()
 
     def __str__(self):
         return "From " + str(self.from_bank) + " To " + str(self.to_credit_card) + ": $" + str(self.amount) + \
                " on " + str(self.date_stamp) + "."
+
+    def show_all(self):
+        return ["From:", self.from_bank,
+                "To:", self.to_credit_card,
+                "Date:", str(self.date_stamp),
+                "Amount:", "$" + str(self.amount)]
