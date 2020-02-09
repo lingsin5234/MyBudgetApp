@@ -57,15 +57,15 @@ class LineItem(models.Model):
 # Credit Card
 class CreditCard(models.Model):
     id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=15, null=True, blank=True, default=None)
+    nickname = models.CharField(max_length=15, null=True, blank=True, default=None)
     colour = models.CharField(max_length=7, null=True, default=None)
     balance = models.FloatField(default=0)
 
     def __str__(self):
-        return self.name
+        return self.nickname
 
     def show_all(self):
-        return ["Credit Card:", self.name,
+        return ["Credit Card:", self.nickname,
                 "Colour:", self.colour]
 
 

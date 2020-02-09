@@ -18,7 +18,7 @@ class UploadExpCatForm(forms.ModelForm):
 class UploadCreditCardForm(forms.ModelForm):
     class Meta:
         model = CreditCard
-        fields = ['name']
+        fields = ['nickname', 'colour']
 
 
 class UploadExpenseForm(forms.ModelForm):
