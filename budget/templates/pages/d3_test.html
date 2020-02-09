@@ -95,11 +95,11 @@
             .attr("width", 1100).attr("height", 2200);
         var factor = 70;
 
-		// new svg function
-		function add_info_box(data, main_svg) {
+        // new svg function
+        function add_info_box(data, main_svg) {
             // create nested svg
             var svg = main_svg.append("svg")
-                .attr("width", 270).attr("height", data.length*70);
+                .attr("width", 270).attr("height", data.length*factor);
             // create group element
             var groups = svg.selectAll("g")
                 .data(data).enter().append("g");
@@ -107,7 +107,7 @@
             var each_box = groups.append("rect")
                 .attr("x", 10).attr("width", 250)
                 .attr("y", function(d) { return (d.id-0.95)*factor; })
-                .attr("height", 65)
+                .attr("height", factor-5)
                 .style("fill", function(d) { return d.colour; });
             // box name
             var box_name = groups.append("text")
@@ -137,11 +137,11 @@
             var click_box = groups.append("rect")
                 .attr("x", 10).attr("width", 250)
                 .attr("y", function(d) { return (d.id-0.95)*factor; })
-                .attr("height", 65)
+                .attr("height", factor-5)
                 .style("fill-opacity", 0)
                 .attr("class", "bank_account")
                 .attr("id", function(d) { return d.nickname; });
-            return;
+            return data.length*factor;
         }
         // call svg function for both bank account and credit cards
 		add_info_box(bank_info, main_svg);
