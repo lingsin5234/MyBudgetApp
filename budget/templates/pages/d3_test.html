@@ -91,18 +91,20 @@
     <script>
         var bank_info = JSON.parse('{{bank_info|safe}}');
         var credit_card = JSON.parse('{{credit_card|safe}}');
-        var svg = d3.select("body").append("svg")
+        var main_svg = d3.select("body").append("svg")
             .attr("width", 1100).attr("height", 2200);
-        var dashboard = svg.selectAll("g")
+		var banks = main_svg.append("svg")
+			.attr("width", 270).attr("height", bank_info.length*70)
+        var bank_svg = banks.selectAll("g")
             .data(bank_info).enter().append("g");
         var factor = 70
         // initial box
-        var each_bank = dashboard.append("rect")
+        var each_bank = bank_svg.append("rect")
             .attr("x", 10).attr("width", 250)
             .attr("y", function(d) { return (d.id-0.95)*factor })
             .attr("height", 65)
             .style("fill", function(d) { return d.colour; });
-        var bank_name = dashboard.append("text")
+        var bank_name = bank_svg.append("text")
             .style("text-anchor", "middle")
             .attr("x", 135)
             .attr("y", function(d) { return (d.id-0.6)*factor })
@@ -111,12 +113,12 @@
             .attr("fill", "white")
             .text(function(d) { return d.nickname; });
         // box for the amount
-        var amount_box = dashboard.append("rect")
+        var amount_box = bank_svg.append("rect")
             .attr("x", 60).attr("width", 150)
             .attr("y", function(d) { return (d.id-0.47)*factor })
             .attr("height", 25)
             .style("fill", "#222222");
-        var bank_amount = dashboard.append("text")
+        var bank_amount = bank_svg.append("text")
             .style("text-anchor", "middle")
             .attr("x", 135)
             .attr("y", function(d) { return (d.id-0.25)*factor })
@@ -125,7 +127,7 @@
             .attr("fill", "white")
             .text(function(d) { return "$" + d.balance; });
         // put a clickable box on top - but transparent
-        var click_box = dashboard.append("rect")
+        var click_box = bank_svg.append("rect")
             .attr("x", 10).attr("width", 250)
             .attr("y", function(d) { return (d.id-0.95)*factor })
             .attr("height", 65)
@@ -134,7 +136,7 @@
             .attr("id", function(d) { return d.nickname });
 
         // second set of boxes for credit cards
-        var dash2 = svg.append("svg").selectAll("g")
+        var dash2 = main_svg.append("svg").selectAll("g")
             .data(credit_card).enter().append("g");
         // initial box
         var each_cc = dash2.append("rect")
@@ -175,7 +177,7 @@
 
 
         // graph to show
-        var graph_space = svg.append("svg")
+        var graph_space = main_svg.append("svg")
             .attr("x", 300).attr("width", 700)
             .attr("y", 0.05*factor).attr("height", 600);
         var show_graph = graph_space.append("g");
