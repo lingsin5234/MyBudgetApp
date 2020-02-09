@@ -96,11 +96,29 @@
         var factor = 70;
 
         // new svg function
-        function add_info_box(data, main_svg, initial_height, factor) {
-            // create nested svg with initial height set
-            var svg = main_svg.append("svg")
-                .attr("width", 270).attr("height", data.length*factor)
+        function add_info_box(data, account_type, main_svg, initial_height, factor) {
+            // create nested svg with initial height set and surrounding box
+            var nested_svg = main_svg.append("svg")
+                .attr("width", 300).attr("height", factor*(data.length+1))
                 .attr("x", 0).attr("y", initial_height);
+            var nested_box = nested_svg.append("rect")
+                .attr("width", 280).attr("height", factor*(data.length+1/2))
+                .attr("x", 10).attr("y", 1)
+                .style("fill", "none")
+                .style("stroke", "#DDDDDD")
+                .style("stroke-width", 1);
+            // create text to indicate what this nested svg is for
+            var nested_text = nested_svg.append("text")
+                .style("text-anchor", "middle")
+                .attr("x", 150).attr("y", 25)
+                .attr("font-family", "roboto")
+                .attr("font-size", "1.1em")
+                .attr("fill", "white")
+                .text(function(d) { return account_type; });
+            // create a second layer of nested svg for the actual accounts
+            var svg = nested_svg.append("svg")
+                .attr("width", 270).attr("height", data.length*factor)
+                .attr("x", 15).attr("y", 30);
             // create group element
             var groups = svg.selectAll("g")
                 .data(data).enter().append("g");
@@ -142,11 +160,11 @@
                 .style("fill-opacity", 0)
                 .attr("class", "an_account")
                 .attr("id", function(d) { return d.nickname.replace(/ /g, ''); });
-            return data.length*70;
+            return factor*(data.length+1);
         }
         // call svg function for both bank account and credit cards
-		box_length1 = add_info_box(bank_info, main_svg, 0, factor);
-		box_length2 = add_info_box(credit_card, main_svg, box_length1, factor);
+        box_length1 = add_info_box(bank_info, "Bank Accounts", main_svg, 0, factor);
+        box_length2 = add_info_box(credit_card, "Credit Cards", main_svg, box_length1, factor);
 
         // graph to show
         var graph_space = main_svg.append("svg")
