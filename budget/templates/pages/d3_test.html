@@ -93,11 +93,66 @@
         var credit_card = JSON.parse('{{credit_card|safe}}');
         var main_svg = d3.select("body").append("svg")
             .attr("width", 1100).attr("height", 2200);
+        var factor = 70;
+
+		// new svg function
+		function add_info_box(data, main_svg) {
+            // create nested svg
+            var svg = main_svg.append("svg")
+                .attr("width", 270).attr("height", data.length*70);
+            // create group element
+            var groups = svg.selectAll("g")
+                .data(data).enter().append("g");
+            // initial box
+            var each_box = groups.append("rect")
+                .attr("x", 10).attr("width", 250)
+                .attr("y", function(d) { return (d.id-0.95)*factor; })
+                .attr("height", 65)
+                .style("fill", function(d) { return d.colour; });
+            // box name
+            var box_name = groups.append("text")
+                .style("text-anchor", "middle")
+                .attr("x", 135)
+                .attr("y", function(d) { return (d.id-0.6)*factor; })
+                .attr("font-family", "roboto")
+                .attr("font-size", "1.25em")
+                .attr("fill", "white")
+                .text(function(d) { return d.nickname; });
+            // box for the amount
+            var amount_box = groups.append("rect")
+                .attr("x", 60).attr("width", 150)
+                .attr("y", function(d) { return (d.id-0.47)*factor; })
+                .attr("height", 25)
+                .style("fill", "#222222");
+            // actual amount
+            var amount = groups.append("text")
+                .style("text-anchor", "middle")
+                .attr("x", 135)
+                .attr("y", function(d) { return (d.id-0.25)*factor; })
+                .attr("font-family", "roboto")
+                .attr("font-size", "0.7em")
+                .attr("fill", "white")
+                .text(function(d) { return "$" + d.balance; });
+            // clickable transparent box overtop
+            var click_box = groups.append("rect")
+                .attr("x", 10).attr("width", 250)
+                .attr("y", function(d) { return (d.id-0.95)*factor; })
+                .attr("height", 65)
+                .style("fill-opacity", 0)
+                .attr("class", "bank_account")
+                .attr("id", function(d) { return d.nickname; });
+            return;
+        }
+        // call svg function for both bank account and credit cards
+		add_info_box(bank_info, main_svg);
+		add_info_box(credit_card, main_svg);
+
+		/* comment out to test new svg function
 		var banks = main_svg.append("svg")
 			.attr("width", 270).attr("height", bank_info.length*70)
         var bank_svg = banks.selectAll("g")
             .data(bank_info).enter().append("g");
-        var factor = 70
+        var factor = 70;
         // initial box
         var each_bank = bank_svg.append("rect")
             .attr("x", 10).attr("width", 250)
@@ -174,7 +229,7 @@
             .style("fill-opacity", 0)
             .attr("class", "credit_card")
             .attr("id", function(d) { return d.name.replace(/ /g,'') });
-
+        comment out to test new svg function */
 
         // graph to show
         var graph_space = main_svg.append("svg")
