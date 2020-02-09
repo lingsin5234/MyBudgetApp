@@ -97,3 +97,10 @@ def credit_card_payment(data):
     bank.save()
     cc.save()
     return
+
+
+# update EXPENSES for the credit card OR bank accounts based the bank line item!
+def update_bank_exp(data):
+    cash = BankAccount.objects.get(nickname="Cash")
+
+    return
