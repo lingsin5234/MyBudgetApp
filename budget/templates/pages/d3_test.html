@@ -105,7 +105,7 @@
                 .attr("width", 280).attr("height", factor*(data.length+1/2))
                 .attr("x", 10).attr("y", 1)
                 .style("fill", "none")
-                .style("stroke", "#DDDDDD")
+                .style("stroke", "#AAAAAA")
                 .style("stroke-width", 1);
             // create text to indicate what this nested svg is for
             var nested_text = nested_svg.append("text")
@@ -254,7 +254,7 @@
         }
 
         // on click - the class
-        d3.selectAll(".bank_account").on("click", function(d) {
+        d3.selectAll(".an_account").on("click", function(d) {
             var which_account = d3.select(this).property("id");
             updateChart(which_account);
         })
