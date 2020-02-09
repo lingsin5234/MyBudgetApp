@@ -117,7 +117,7 @@ class RevenueLineItem(models.Model):
     name = models.CharField(max_length=30)
     category = models.ForeignKey(RevCategory, on_delete=models.SET_DEFAULT, default='Uncategorized')
     cash_debit = models.CharField(max_length=5, choices=CASH_DEBIT)
-    bank_account = models.ForeignKey(BankAccount, on_delete=models.SET_DEFAULT, default='Missing Bank')
+    bank_account = models.ForeignKey(BankAccount, null=True, on_delete=models.SET_NULL)
     date_stamp = models.DateField()
     amount = models.FloatField()
 
@@ -152,8 +152,8 @@ class BankLineItem(models.Model):
 class CreditCardPayment(models.Model):
     id = models.IntegerField(primary_key=True)
     amount = models.FloatField()
-    from_bank = models.ForeignKey(BankAccount, on_delete=models.SET_DEFAULT, default='_defunct_acct')
-    to_credit_card = models.ForeignKey(CreditCard, on_delete=models.SET_DEFAULT, default='_defunct_cc')
+    from_bank = models.ForeignKey(BankAccount, null=True, on_delete=models.SET_NULL)
+    to_credit_card = models.ForeignKey(CreditCard, null=True, on_delete=models.SET_NULL)
     date_stamp = models.DateField()
 
     def __str__(self):
