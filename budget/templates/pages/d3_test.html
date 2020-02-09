@@ -90,8 +90,9 @@
 
     <script>
         var bank_info = JSON.parse('{{bank_info|safe}}');
+        var credit_card = JSON.parse('{{credit_card|safe}}');
         var svg = d3.select("body").append("svg")
-            .attr("width", 1100).attr("height", 1100);
+            .attr("width", 1100).attr("height", 2200);
         var dashboard = svg.selectAll("g")
             .data(bank_info).enter().append("g");
         var factor = 70
@@ -131,6 +132,48 @@
             .style("fill-opacity", 0)
             .attr("class", "bank_account")
             .attr("id", function(d) { return d.nickname });
+
+        // second set of boxes for credit cards
+        var dash2 = svg.append("svg").selectAll("g")
+            .data(credit_card).enter().append("g");
+        // initial box
+        var each_cc = dash2.append("rect")
+            .attr("x", 10).attr("width", 250)
+            .attr("y", function(d) { return (d.id-0.95)*factor+150 })
+            .attr("height", 65)
+            .style("fill", function(d) { return d.colour; });
+        var cc_name = dash2.append("text")
+            .style("text-anchor", "middle")
+            .attr("x", 135)
+            .attr("y", function(d) { return (d.id-0.6)*factor+150 })
+            .attr("font-family", "roboto")
+            .attr("font-size", "1.25em")
+            .attr("fill", "white")
+            .text(function(d) { return d.name; });
+        // box for the amount
+        var cc_amount_box = dash2.append("rect")
+            .attr("x", 60).attr("width", 150)
+            .attr("y", function(d) { return (d.id-0.47)*factor+150 })
+            .attr("height", 25)
+            .style("fill", "#222222");
+        var cc_amount = dash2.append("text")
+            .style("text-anchor", "middle")
+            .attr("x", 135)
+            .attr("y", function(d) { return (d.id-0.25)*factor+150 })
+            .attr("font-family", "roboto")
+            .attr("font-size", "0.7em")
+            .attr("fill", "white")
+            .text(function(d) { return "$" + d.balance; });
+        // put a clickable box on top - but transparent
+        var cc_click_box = dash2.append("rect")
+            .attr("x", 10).attr("width", 250)
+            .attr("y", function(d) { return (d.id-0.95)*factor+150 })
+            .attr("height", 65)
+            .style("fill-opacity", 0)
+            .attr("class", "credit_card")
+            .attr("id", function(d) { return d.name.replace(/ /g,'') });
+
+
         // graph to show
         var graph_space = svg.append("svg")
             .attr("x", 300).attr("width", 700)
