@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from .models import LineItem, ExpCategory, CreditCard, ExpenseLineItem
+from .models import BankLineItem, CreditCardLineItem
 from .models import RevCategory, BankAccount, RevenueLineItem, CreditCardPayment
 from .forms import UploadLineItemForm, UploadExpCatForm, UploadCreditCardForm, UploadExpenseForm
 from .forms import UploadRevCatForm, UploadBankAccountForm, UploadRevenueForm, UploadBankLineItemForm
@@ -31,11 +32,15 @@ def show_d3(request):
     revenue = RevenueLineItem.objects.all()
     bank = BankAccount.objects.all()
     cc = CreditCard.objects.all()
+    bank_line = BankLineItem.objects.all()
+    cc_line = CreditCardLineItem.objects.all()
     output = []
     cats = []
     revs = []
     banks = []
     ccs = []
+    bank_lines = []
+    cc_lines = []
     for item in items:
         add = model_to_dict(item)
         output.append(add)
@@ -109,6 +114,12 @@ def show_d3(request):
     for c in cc:
         add = model_to_dict(c)
         ccs.append(add)
+    for bl in bank_line:
+        add = model_to_dict(bl)
+        bank_lines.append(add)
+    for cl in cc_line:
+        add = model_to_dict(cl)
+        cc_lines.append(add)
 
     context = {
         'expense': json.dumps(output, cls=DjangoJSONEncoder),
@@ -117,6 +128,8 @@ def show_d3(request):
         # 'bank_info': json.dumps(bank_info),
         'bank_info': json.dumps(banks),
         'credit_card': json.dumps(ccs),
+        'bank_lines': json.dumps(bank_lines),
+        'cc_lines': json.dumps(cc_lines),
         'data': data,
         'json_data': json.dumps(json_data),
         # 'line_items': output,
