@@ -41,22 +41,21 @@ def get_exp_data(post_data):
         cash = BankAccount.objects.get(nickname="Cash")
         exp_data = {
             'amount': post_data['amount'],
-            'from_transaction': 'cash',
+            'from_transaction': '',
             'to_transaction': str(cash.id),
             'date_stamp': post_data['date_stamp']
         }
     elif post_data['pay_type'] == 'debit':
         exp_data = {
             'amount': post_data['amount'],
-            'from_transaction': 'debit',
+            'from_transaction': '',
             'to_transaction': post_data['bank_account'],
             'date_stamp': post_data['date_stamp']
         }
     else:
         exp_data = {
             'amount': post_data['amount'],
-            'from_transaction': 'credit',
-            'to_transaction': post_data['credit_card'],
+            'to_credit_card': post_data['card_name'],
             'date_stamp': post_data['date_stamp']
         }
     return exp_data
@@ -116,20 +115,20 @@ def credit_card_payment(data):
 
 
 # update EXPENSES for the credit card OR bank accounts based the bank line item!
-def update_bank_exp(data):
+def update_bank_exp(data, pay_type):
     # cash expense
-    if data['from_transaction'] == 'cash':
+    if pay_type == 'cash':
         cash = BankAccount.objects.get(nickname="Cash")
         cash.balance -= float(data['amount'])
         cash.save()
     # debit expense
-    elif data['from_transaction'] == 'debit':
+    elif pay_type == 'debit':
         bank = BankAccount.objects.get(id=int(data['to_transaction']))
         bank.balance -= float(data['amount'])
         bank.save()
     # credit expense - this one is ADD
     else:
-        cc = CreditCard.objects.get(id=int(data['to_transaction']))
+        cc = CreditCard.objects.get(id=int(data['to_credit_card']))
         cc.balance += float(data['amount'])
         cc.save()
 

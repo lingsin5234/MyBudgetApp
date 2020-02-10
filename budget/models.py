@@ -150,6 +150,18 @@ class BankLineItem(models.Model):
                " on " + str(self.date_stamp) + "."
 
 
+# Credit Card Account Transactional Items
+class CreditCardLineItem(models.Model):
+    id = models.IntegerField(primary_key=True)
+    amount = models.FloatField()
+    to_credit_card = models.ForeignKey(CreditCard, null=True, on_delete=models.SET_NULL)
+    date_stamp = models.DateField()
+
+    def __str__(self):
+        return "Expense Item credited to " + str(self.to_credit_card) + " for: $" + str(self.amount) + \
+               " on " + str(self.date_stamp) + "."
+
+
 # Credit Card Payment
 class CreditCardPayment(models.Model):
     id = models.IntegerField(primary_key=True)

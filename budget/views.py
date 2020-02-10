@@ -4,12 +4,12 @@ from .models import LineItem, ExpCategory, CreditCard, ExpenseLineItem
 from .models import RevCategory, BankAccount, RevenueLineItem, CreditCardPayment
 from .forms import UploadLineItemForm, UploadExpCatForm, UploadCreditCardForm, UploadExpenseForm
 from .forms import UploadRevCatForm, UploadBankAccountForm, UploadRevenueForm, UploadBankLineItemForm
-from .forms import UploadCreditCardPaymentForm
+from .forms import UploadCreditCardPaymentForm, UploadCreditCardLineItemForm
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 from django.forms.models import model_to_dict
-from .functions import get_exp_data, get_rev_data, update_bank_rev, credit_card_payment
+from .functions import get_exp_data, get_rev_data, update_bank_rev, credit_card_payment, update_bank_exp
 
 
 # line item test view
@@ -163,11 +163,16 @@ def upload_data(request, upload_type):
 
             # check if it's expense or revenue line item
             if upload_type == 'expense':
-                # expense then get expenses then submit bank form
+                # expense then get corresponding bank/cc form
                 exp_data = get_exp_data(request.POST)
-                form2 = UploadBankLineItemForm(exp_data)
+                if request.POST['pay_type'] == 'cash' or request.POST['pay_type'] == 'debit':
+                    form2 = UploadBankLineItemForm(exp_data)
+                else:
+                    form2 = UploadCreditCardLineItemForm(exp_data)
 
                 if form2.is_valid():
+                    # proceed to edit the appropriate account!
+                    update_bank_exp(exp_data, request.POST['pay_type'])
                     form2.save()
                 else:
                     HttpResponse('<h1>Bank Line Item Form error</h1>')
