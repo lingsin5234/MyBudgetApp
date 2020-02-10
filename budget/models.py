@@ -108,6 +108,7 @@ class ExpenseLineItem(models.Model):
                 "Category:", self.category,
                 "Payment:", self.pay_type,
                 "Card Name:", self.card_name,
+                "Bank Account:", self.bank_account,
                 "Date:", str(self.date_stamp),
                 "Amount:", "$" + str(self.amount)]
 
