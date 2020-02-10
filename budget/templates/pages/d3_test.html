@@ -134,11 +134,11 @@
 			.attr("transform", "translate(50, 10)")
 			.attr("class", "y_axis")
 			.call(d3.axisLeft(y));
-        /*
+
         // update function
         function updateChart(accountData) {
 
-			// get the correct data sets, this will return as list of dict(s)
+            // get the correct data sets, this will return as list of dict(s)
             //data = bank_info.filter(obj => obj.name === whichAccount)
 
             // get min and max values again
@@ -156,45 +156,45 @@
                 .transition().duration(1000)
                 .call(d3.axisBottom(x));
 
-			// plot the dots
-			var dot = show_graph.selectAll('circle')
-				.data(accountData).enter().append('circle')
-				.attr("cx", function(d) { return x(+d.id)+50 })
-				.attr("cy", function(d) { return y(+d.amount)+10 })
-				.attr("r", 4).style("fill", "#2f7fef");
+            // plot the dots
+            var dot = show_graph.selectAll('circle')
+                .data(accountData).enter().append('circle')
+                .attr("cx", function(d) { return x(+d.id)+50 })
+                .attr("cy", function(d) { return y(+d.amount)+10 })
+                .attr("r", 4).style("fill", "#2f7fef");
 
-			return;
-        }*/
+            return;
+        };
 
-		// get appropriate account
-		function get_data(whichAccount) {
+        // get appropriate account
+        function get_data(whichAccount) {
 
-			// look thru bank accounts
-			for (i=0, i < bank_info.length, i++) {
-				if (bank_info[i].nickname.replace(/ /g, '') == whichAccount) {
-					id = str(bank_info[i].id);
-					index = bank_lines.first { $0["id"] == id }?.value;
-					data = bank_lines[index];
-					print_text
+            // look thru bank accounts
+            for (i=0; i < bank_info.length; i++) {
+                if (bank_info[i].nickname.replace(/ /g, '') == whichAccount) {
+                    id = str(bank_info[i].id);
+                    index = bank_lines.first { $0["id"] == id }?.value;
+                    data = bank_lines[index];
+                    print_text
                         .text(function() {return data;});
-					return data;
-				}
-			}
+                    return data;
+                }
+            }
 
-			// look thru credit cards
-			for (i=0, i < credit_card.length, i++) {
-				if (credit_card[i].nickname.replace(/ /g, '') == whichAccount) {
-					id = str(credit_card[i].id);
-					index = cc_lines.first { $0["id"] == id }?.value;
-					data = cc_lines[index];
-					print_text
+            // look thru credit cards
+            for (i=0; i < credit_card.length; i++) {
+                if (credit_card[i].nickname.replace(/ /g, '') == whichAccount) {
+                    id = str(credit_card[i].id);
+                    index = cc_lines.first { $0["id"] == id }?.value;
+                    data = cc_lines[index];
+                    print_text
                         .text(function() {return data;});
-					return data;
-				}
-			}
+                    return data;
+                }
+            }
 
-			return 0;
-		};
+            return 0;
+        };
 
         // on click - the class
         d3.selectAll(".an_account").on("click", function(d) {
