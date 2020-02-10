@@ -37,12 +37,29 @@ def get_rev_data(post_data):
 
 # get bank line item form data from the expense line item input
 def get_exp_data(post_data):
-    exp_data = {
-        'amount': post_data['amount'],
-        'from_transaction': '',
-        'to_transaction': post_data['credit_card'],
-        'date_stamp': post_data['date_stamp']
-    }
+    if post_data['pay_type'] == 'cash':
+        cash = BankAccount.objects.get(nickname="Cash")
+        exp_data = {
+            'amount': post_data['amount'],
+            'from_transaction': '',
+            'to_transaction': str(cash.id),
+            'date_stamp': post_data['date_stamp']
+        }
+    elif post_data['pay_type'] == 'debit':
+        # bank = BankAccount.objects.get(id=int(post_data['bank_name']))
+        exp_data = {
+            'amount': post_data['amount'],
+            'from_transaction': '',
+            'to_transaction': post_data['bank_name'],
+            'date_stamp': post_data['date_stamp']
+        }
+    else:
+        exp_data = {
+            'amount': post_data['amount'],
+            'from_transaction': '',
+            'to_transaction': post_data['credit_card'],
+            'date_stamp': post_data['date_stamp']
+        }
     return exp_data
 
 

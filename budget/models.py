@@ -96,6 +96,7 @@ class ExpenseLineItem(models.Model):
     category = models.ForeignKey(ExpCategory, on_delete=models.SET_DEFAULT, default='Uncategorized')
     pay_type = models.CharField(max_length=6, choices=PAY_TYPE)
     card_name = models.ForeignKey(CreditCard, on_delete=models.SET_NULL, null=True, blank=True, default=None)
+    bank_account = models.ForeignKey(BankAccount, on_delete=models.SET_NULL, null=True, blank=True, default=None)
     date_stamp = models.DateField()
     amount = models.FloatField()
 
