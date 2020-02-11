@@ -170,14 +170,18 @@
         function get_data(whichAccount) {
             //var id = 10;
             //var id = bank_info[0].id;
-            print_text
-                .text(function() {return id;});
+            //var id = bank_info[1].nickname.replace(/ /g, '')
+            //print_text
+                //.text(whichAccount + ' - ' + id + ': ' + bank_info.length);
             // look thru bank accounts
             for (i=0; i < bank_info.length; i++) {
-                if (bank_info[i].nickname.replace(/ /g, '') == whichAccount) {
-                    id = str(bank_info[i].id);
+                check_str = bank_info[i].nickname.replace(/ /g, '');
+                //print_text
+                    //.text(whichAccount + ' - ' + check_str + ': ' + bank_info.length);
+                if (check_str === whichAccount) {
+                    id = bank_info[i].id;
                     print_text
-                                .text(function() {return id;});
+                        .text(function() {return id;});
                     /*for (index, element) in bank_lines.enumerate() {
                         if (element.id == id) {
                             data = bank_lines[index];
