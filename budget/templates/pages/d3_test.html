@@ -180,16 +180,16 @@
                     //.text(whichAccount + ' - ' + check_str + ': ' + bank_info.length);
                 if (check_str === whichAccount) {
                     id = bank_info[i].id;
-                    print_text
-                        .text(function() {return id;});
-                    /*for (index, element) in bank_lines.enumerate() {
-                        if (element.id == id) {
-                            data = bank_lines[index];
+                    //print_text
+                        //.text(function() {return id;});
+                    for (j=0; j < bank_lines.length; j++) {
+                        if (bank_lines[j].to_transaction === id) {
+                            data = bank_lines[j];
                             print_text
                                 .text(function() {return data;});
                             return data;
                         }
-                    }*/
+                    }
                 }
             }
 
