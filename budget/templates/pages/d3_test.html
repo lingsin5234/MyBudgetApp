@@ -168,16 +168,24 @@
 
         // get appropriate account
         function get_data(whichAccount) {
-
+            //var id = 10;
+            //var id = bank_info[0].id;
+            print_text
+                .text(function() {return id;});
             // look thru bank accounts
             for (i=0; i < bank_info.length; i++) {
                 if (bank_info[i].nickname.replace(/ /g, '') == whichAccount) {
                     id = str(bank_info[i].id);
-                    index = bank_lines.first { $0["id"] == id }?.value;
-                    data = bank_lines[index];
                     print_text
-                        .text(function() {return data;});
-                    return data;
+                                .text(function() {return id;});
+                    /*for (index, element) in bank_lines.enumerate() {
+                        if (element.id == id) {
+                            data = bank_lines[index];
+                            print_text
+                                .text(function() {return data;});
+                            return data;
+                        }
+                    }*/
                 }
             }
 
@@ -185,11 +193,11 @@
             for (i=0; i < credit_card.length; i++) {
                 if (credit_card[i].nickname.replace(/ /g, '') == whichAccount) {
                     id = str(credit_card[i].id);
-                    index = cc_lines.first { $0["id"] == id }?.value;
-                    data = cc_lines[index];
                     print_text
-                        .text(function() {return data;});
-                    return data;
+                        .text(function() {return id;});
+                    /*index = cc_lines.filter({ $0["id"] as! String == id }).first;
+                    data = cc_lines[index];
+                    return data;*/
                 }
             }
 
@@ -200,8 +208,8 @@
         d3.selectAll(".an_account").on("click", function(d) {
             var which_account = d3.select(this).property("id");
             accountData = get_data(which_account, bank_info, credit_card);
-            print_text
-                .text(function() {return accountData;});
+            /*print_text
+                .text(function() {return accountData;});*/
             //updateChart(accountData);
         })
     </script>
