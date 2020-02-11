@@ -107,36 +107,36 @@
             return max;
         };
 
-		// set the dimensions and margins of the graph
-		var margin = {top: 10, right: 50, bottom: 30, left: 50},
-			width = 600 - margin.left - margin.right,
-			height = 600 - margin.top - margin.bottom;
-		var print_text = show_graph.append("text")
-			.style("text-anchor", "middle")
-			.attr("x", 250).attr("y", 50)
-			.attr("font-family", "roboto")
-			.attr("font-size", "1em")
-			.attr("fill", "white")
-			.text(function(d) {return 0;});
-		// put X axis in date format
-		var x = d3.scaleLinear()
-			.domain([0,10])
-			.range([ 0, width ]);
-		show_graph.append("g")
-			.attr("transform", "translate(50," + (height+10) + ")")
-			.attr("class", "x_axis")
-			.call(d3.axisBottom(x));
-		// add the Y axis
-		var y = d3.scaleLinear()
-			.domain([0,1000])
-			.range([height,0]);
-		show_graph.append("g")
-			.attr("transform", "translate(50, 10)")
-			.attr("class", "y_axis")
-			.call(d3.axisLeft(y));
-		// declare dots but don't place any
-		var dot = show_graph.selectAll('circle')
-		    .data(bank_info).enter().append('circle');
+        // set the dimensions and margins of the graph
+        var margin = {top: 10, right: 50, bottom: 30, left: 50},
+            width = 600 - margin.left - margin.right,
+            height = 600 - margin.top - margin.bottom;
+        var print_text = show_graph.append("text")
+            .style("text-anchor", "middle")
+            .attr("x", 250).attr("y", 50)
+            .attr("font-family", "roboto")
+            .attr("font-size", "1em")
+            .attr("fill", "white")
+            .text(function(d) {return 0;});
+        // put X axis in date format
+        var x = d3.scaleLinear()
+            .domain([0,10])
+            .range([ 0, width ]);
+        show_graph.append("g")
+            .attr("transform", "translate(50," + (height+10) + ")")
+            .attr("class", "x_axis")
+            .call(d3.axisBottom(x));
+        // add the Y axis
+        var y = d3.scaleLinear()
+            .domain([0,1000])
+            .range([height,0]);
+        show_graph.append("g")
+            .attr("transform", "translate(50, 10)")
+            .attr("class", "y_axis")
+            .call(d3.axisLeft(y));
+        // declare dots but don't place any
+        var dot = show_graph.selectAll('circle')
+            .data(bank_info).enter().append('circle');
 
         // update function
         function updateChart(accountData) {
@@ -185,18 +185,13 @@
             // look thru bank accounts
             for (i=0; i < bank_info.length; i++) {
                 check_str = bank_info[i].nickname.replace(/ /g, '');
-                //print_text
-                    //.text(whichAccount + ' - ' + check_str + ': ' + bank_info.length);
                 if (check_str === whichAccount) {
                     id = bank_info[i].id;
-                    //print_text
-                        //.text(function() {return id;});
                     for (j=0; j < bank_lines.length; j++) {
                         if (bank_lines[j].to_transaction === id) {
                             data.push(bank_lines[j]);
-                            //print_text
-                                //.text(function() {return data;});
-
+                        } else if (bank_lines[j].from_transaction === id) {
+                            data.push(bank_lines[j]);
                         }
                     }
                 }
