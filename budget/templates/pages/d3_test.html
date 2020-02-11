@@ -164,9 +164,16 @@
                 .transition().duration(1000)
                 .call(d3.axisLeft(y));
 
-            // plot the dots
+            // load the new data
             dot
-                .data(accountData).transition().duration(1000)
+                .data(accountData);
+
+            // remove any surplus data points first
+            show_graph.exit().remove();
+
+            // plot the remaining dots
+            dot
+                .transition().duration(1000)
                 .attr("cx", function(d) { return x(+d.id)+50 })
                 .attr("cy", function(d) { return y(+d.amount)+10 })
                 .attr("r", 4).style("fill", "#2f7fef");
