@@ -147,7 +147,7 @@
 
             // print text to check
             print_text
-                .text(function(d) {return min_rev;});
+                .text(function(d) {return max_rev;});
 
             // reset the Y and X axis
             x
@@ -155,9 +155,14 @@
             show_graph.selectAll("g.x_axis")
                 .transition().duration(1000)
                 .call(d3.axisBottom(x));
+            y
+                .domain([min_rev, max_rev]);
+            show_graph.selectAll("g.y_axis")
+                .transition().duration(1000)
+                .call(d3.axisLeft(y));
 
             // plot the dots
-            var dot = show_graph.selectAll('circle')
+            dot = show_graph.selectAll('circle')
                 .data(accountData).enter().append('circle')
                 .attr("cx", function(d) { return x(+d.id)+50 })
                 .attr("cy", function(d) { return y(+d.amount)+10 })
@@ -168,6 +173,7 @@
 
         // get appropriate account
         function get_data(whichAccount) {
+            var data = [];
             //var id = 10;
             //var id = bank_info[0].id;
             //var id = bank_info[1].nickname.replace(/ /g, '')
@@ -184,15 +190,15 @@
                         //.text(function() {return id;});
                     for (j=0; j < bank_lines.length; j++) {
                         if (bank_lines[j].to_transaction === id) {
-                            data = bank_lines[j];
-                            print_text
-                                .text(function() {return data;});
-                            return data;
+                            data.push(bank_lines[j]);
+                            //print_text
+                                //.text(function() {return data;});
+
                         }
                     }
                 }
             }
-
+            return data;
             // look thru credit cards
             for (i=0; i < credit_card.length; i++) {
                 if (credit_card[i].nickname.replace(/ /g, '') == whichAccount) {
@@ -212,9 +218,9 @@
         d3.selectAll(".an_account").on("click", function(d) {
             var which_account = d3.select(this).property("id");
             accountData = get_data(which_account, bank_info, credit_card);
-            /*print_text
-                .text(function() {return accountData;});*/
-            //updateChart(accountData);
+            //print_text
+                //.text(function() {return accountData;});
+            updateChart(accountData);
         })
     </script>
 
