@@ -42,7 +42,7 @@ class LineItem(models.Model):
     name = models.CharField(max_length=30)
     category = models.OneToOneField(ExpCategory, on_delete=models.SET_DEFAULT, default='Uncategorized')
     date_stamp = models.DateField()
-    amount = models.DecimalField(decimal_places=2)
+    amount = models.DecimalField(decimal_places=2, max_digits=9)
 
     def __str__(self):
         return self.name
@@ -59,7 +59,7 @@ class CreditCard(models.Model):
     id = models.IntegerField(primary_key=True)
     nickname = models.CharField(max_length=15, null=True, blank=True, default=None)
     colour = models.CharField(max_length=7, null=True, default=None)
-    balance = models.FloatField(default=0)
+    balance = models.DecimalField(default=0, decimal_places=2, max_digits=9)
 
     def __str__(self):
         return self.nickname
@@ -75,7 +75,7 @@ class BankAccount(models.Model):
     nickname = models.CharField(max_length=15, unique=True)
     bank_name = models.CharField(max_length=15, null=True, blank=True, default=None)
     account_type = models.CharField(max_length=15)
-    balance = models.FloatField()
+    balance = models.DecimalField(decimal_places=2, max_digits=9)
     colour = models.CharField(max_length=7, default='#FFFFFF')
 
     def __str__(self):
@@ -98,7 +98,7 @@ class ExpenseLineItem(models.Model):
     card_name = models.ForeignKey(CreditCard, on_delete=models.SET_NULL, null=True, blank=True, default=None)
     bank_account = models.ForeignKey(BankAccount, on_delete=models.SET_NULL, null=True, blank=True, default=None)
     date_stamp = models.DateField()
-    amount = models.DecimalField(decimal_places=2)
+    amount = models.DecimalField(decimal_places=2, max_digits=9)
 
     def __str__(self):
         return self.name
@@ -121,7 +121,7 @@ class RevenueLineItem(models.Model):
     cash_debit = models.CharField(max_length=5, choices=CASH_DEBIT)
     bank_account = models.ForeignKey(BankAccount, null=True, on_delete=models.SET_NULL)
     date_stamp = models.DateField()
-    amount = models.DecimalField(decimal_places=2)
+    amount = models.DecimalField(decimal_places=2, max_digits=9)
 
     def __str__(self):
         return self.name
@@ -138,7 +138,7 @@ class RevenueLineItem(models.Model):
 # Bank Account Transactional Items
 class BankLineItem(models.Model):
     id = models.IntegerField(primary_key=True)
-    amount = models.DecimalField(decimal_places=2)
+    amount = models.DecimalField(decimal_places=2, max_digits=9)
     from_transaction = models.ForeignKey(BankAccount, null=True, blank=True,
                                          on_delete=models.SET_NULL, related_name='_unused_1')
     to_transaction = models.ForeignKey(BankAccount, null=True, blank=True,
@@ -153,7 +153,7 @@ class BankLineItem(models.Model):
 # Credit Card Account Transactional Items
 class CreditCardLineItem(models.Model):
     id = models.IntegerField(primary_key=True)
-    amount = models.DecimalField(decimal_places=2)
+    amount = models.DecimalField(decimal_places=2, max_digits=9)
     to_credit_card = models.ForeignKey(CreditCard, null=True, on_delete=models.SET_NULL)
     date_stamp = models.DateField()
 
@@ -165,7 +165,7 @@ class CreditCardLineItem(models.Model):
 # Credit Card Payment
 class CreditCardPayment(models.Model):
     id = models.IntegerField(primary_key=True)
-    amount = models.DecimalField(decimal_places=2)
+    amount = models.DecimalField(decimal_places=2, max_digits=9)
     from_bank = models.ForeignKey(BankAccount, null=True, on_delete=models.SET_NULL)
     to_credit_card = models.ForeignKey(CreditCard, null=True, on_delete=models.SET_NULL)
     date_stamp = models.DateField()
