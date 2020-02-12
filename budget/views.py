@@ -32,8 +32,8 @@ def show_d3(request):
     revenue = RevenueLineItem.objects.all()
     bank = BankAccount.objects.all()
     cc = CreditCard.objects.all()
-    bank_line = BankLineItem.objects.all()
-    cc_line = CreditCardLineItem.objects.all()
+    bank_line = BankLineItem.objects.all().order_by('-date_stamp')
+    cc_line = CreditCardLineItem.objects.all().order_by('-date_stamp')
     output = []
     cats = []
     revs = []

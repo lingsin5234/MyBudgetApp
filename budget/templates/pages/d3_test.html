@@ -11,6 +11,10 @@
         var factor = 70;
         var recent_number = 3;  // show recent # of transactions
 
+        // get min and max date
+        minDate = d3.min(bank_lines, function(d) { return Date.parse(d.date_stamp); });
+        maxDate = d3.max(bank_lines, function(d) { return Date.parse(d.date_stamp); });
+
         // new svg function
         function add_info_box(data, account_type, main_svg, initial_height, factor) {
             // create nested svg with initial height set and surrounding box
@@ -85,7 +89,7 @@
         // graph to show
         var graph_space = main_svg.append("svg")
             .attr("x", 300).attr("width", 700)
-            .attr("y", 0.05*factor).attr("height", 600);
+            .attr("y", 0.05*factor).attr("height", 700);
         var show_graph = graph_space.append("g");
 
         // get max and min values
@@ -118,15 +122,27 @@
             .attr("font-family", "roboto")
             .attr("font-size", "1em")
             .attr("fill", "white")
-            .text(function(d) {return 0;});
-        // put X axis in date format
-        var x = d3.scaleLinear()
-            .domain([0,10])
-            .range([ 0, width ]);
+            .text(function(d) {return Date(minDate) + ' ' + maxDate;});
+        // add scale and then display X axis
+        var mindate = new Date(2012,0,1),
+            maxdate = new Date(2012,0,31);
+
+        var x_scale = d3.scaleTime()
+            .domain([mindate, maxdate])
+            .range([width, 0]);  // reverse order from [0, width]
+        //var x = d3.svg.axis()
+            //.orient("bottom")
+            //.scale(x_scale);
         show_graph.append("g")
             .attr("transform", "translate(50," + (height+10) + ")")
             .attr("class", "x_axis")
-            .call(d3.axisBottom(x));
+            .call(d3.axisBottom(x_scale)
+                .tickFormat(d3.timeFormat("%Y-%m-%d")))
+            .selectAll("text")
+                .style("text-anchor", "end")
+                .attr("transform", "rotate(-65)");
+        print_text
+            .text(function() {return x_scale; });
         // add the Y axis
         var y = d3.scaleLinear()
             .domain([0,1000])
