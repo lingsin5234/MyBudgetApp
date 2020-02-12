@@ -9,6 +9,7 @@
         var main_svg = d3.select("body").append("svg")
             .attr("width", 1100).attr("height", 2200);
         var factor = 70;
+        var recent_number = 10;  // show recent 10 transactions
 
         // new svg function
         function add_info_box(data, account_type, main_svg, initial_height, factor) {
@@ -149,8 +150,8 @@
             var max_rev = get_max(accountData);
 
             // print text to check
-            print_text
-                .text(function(d) {return max_rev;});
+            //print_text
+                //.text(function(d) {return max_rev;});
 
             // reset the Y and X axis
             x
@@ -194,22 +195,30 @@
                         for (j=0; j < bank_lines.length; j++) {
                             if (bank_lines[j].to_transaction === id) {
                                 data.push(bank_lines[j]);
+                                if (data.length == recent_number) {
+                                    return data;
                             } else if (bank_lines[j].from_transaction === id) {
                                 data.push(bank_lines[j]);
+                                if (data.length == recent_number) {
+                                    return data;
                             }
                         }
                     }
                 }
             } else {
                 // look thru credit cards
+                //print_text
+                    //.text(function() {return account_type;});
                 for (i=0; i < credit_card.length; i++) {
                     check_str = credit_card[i].nickname.replace(/ /g, '');
+                    //print_text
+                        //.text(function() {return check_str + credit_card.length;});
                     if (check_str === whichAccount) {
                         id = credit_card[i].id;
                         for (j=0; j < cc_lines.length; j++) {
-                            if (cc_lines[j].to_transaction === id) {
-                                data.push(cc_lines[j]);
-                            } else if (cc_lines[j].from_transaction === id) {
+                            if (cc_lines[j].to_credit_card === id) {
+                                print_text
+                                    .text(function() {return typeof cc_lines[j].to_credit_card;});
                                 data.push(cc_lines[j]);
                             }
                         }
@@ -224,12 +233,16 @@
         d3.selectAll(".bank_accounts").on("click", function(d) {
             var which_account = d3.select(this).property("id");
             accountData = get_data(which_account, "bank");
+            print_text
+                .text(function() {return accountData;});
             updateChart(accountData);
         })
         // on click - the credit cards
         d3.selectAll(".credit_cards").on("click", function(d) {
             var which_account = d3.select(this).property("id");
             accountData = get_data(which_account, "cc");
+            //print_text
+                //.text(function() {return accountData;});
             updateChart(accountData);
         })
     </script>
