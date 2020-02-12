@@ -116,13 +116,13 @@
         var margin = {top: 10, right: 50, bottom: 30, left: 50},
             width = 600 - margin.left - margin.right,
             height = 600 - margin.top - margin.bottom;
-        var print_text = show_graph.append("text")
+        /*var print_text = show_graph.append("text")
             .style("text-anchor", "middle")
             .attr("x", 250).attr("y", 50)
             .attr("font-family", "roboto")
             .attr("font-size", "1em")
             .attr("fill", "white")
-            .text(function(d) {return Date(minDate) + ' ' + maxDate;});
+            .text(function(d) {return Date(minDate) + ' ' + maxDate;});*/
         // add scale and then display X axis
         var x_scale = d3.scaleTime()
             .domain([minDate, maxDate])
@@ -229,18 +229,12 @@
                 }
             } else {
                 // look thru credit cards
-                //print_text
-                    //.text(function() {return account_type;});
                 for (i=0; i < credit_card.length; i++) {
                     check_str = credit_card[i].nickname.replace(/ /g, '');
-                    //print_text
-                        //.text(function() {return check_str + credit_card.length;});
                     if (check_str === whichAccount) {
                         id = credit_card[i].id;
                         for (j=0; j < cc_lines.length; j++) {
                             if (cc_lines[j].to_credit_card === id) {
-                                print_text
-                                    .text(function() {return typeof cc_lines[j].to_credit_card;});
                                 data.push(cc_lines[j]);
                                 if (data.length == recent_number) {
                                     return data;
@@ -258,16 +252,12 @@
         d3.selectAll(".bank_accounts").on("click", function(d) {
             var which_account = d3.select(this).property("id");
             accountData = get_data(which_account, "bank");
-            print_text
-                .text(function() {return accountData;});
             updateChart(accountData);
         })
         // on click - the credit cards
         d3.selectAll(".credit_cards").on("click", function(d) {
             var which_account = d3.select(this).property("id");
             accountData = get_data(which_account, "cc");
-            //print_text
-                //.text(function() {return accountData;});
             updateChart(accountData);
         })
     </script>
