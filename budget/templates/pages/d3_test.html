@@ -6,6 +6,7 @@
         var credit_card = JSON.parse('{{credit_card|safe}}');
         var bank_lines = JSON.parse('{{bank_lines|safe}}');
         var cc_lines = JSON.parse('{{cc_lines|safe}}');
+        var cc_pays = JSON.parse('{{cc_pays|safe}}');
         var main_svg = d3.select("body").append("svg")
             .attr("width", 1100).attr("height", 2200);
         var factor = 70;
@@ -159,8 +160,8 @@
 
             // print title of selected account
             print_text
-                .text(function() { return accountData[1].amount; });
-                //.text(function() { return accountName + ' - ' + accountData.length
+                //.text(function() { return accountData[1].amount; });
+                .text(function() { return accountName + ' - ' + accountData.length; });
                 //+ ' ' + minAmount + ' ' + maxAmount; });
 
             // load the updated data
@@ -196,19 +197,62 @@
                     if (check_str === whichAccount) {
                         id = bank_info[i].id;
                         acc_name = bank_info[i].nickname;
+
+                        /* need to simultaneously go through both bank line items
+                        // as well as the credit card payments */
+
+                        // pull first 10 relevant bank line items
+                        var count = 0;
+                        var line1 = [];
                         for (j=0; j < bank_lines.length; j++) {
                             if (bank_lines[j].to_transaction === id) {
-                                data.push(bank_lines[j]);
-                                if (data.length == recent_number) {
-                                    return [data, acc_name];
+                                line1.push(bank_lines[j]);
+                                count++;
+                                if (count == recent_number) {
+                                    break;
                                 }
                             } else if (bank_lines[j].from_transaction === id) {
-                                data.push(bank_lines[j]);
-                                if (data.length == recent_number) {
-                                    return [data, acc_name];
+                                line1.push(bank_lines[j]);
+                                count++;
+                                if (count == recent_number) {
+                                    break;
                                 }
                             }
                         }
+                        // now pull first 10 relevant credit card payments
+                        count = 0;
+                        var line2 = [];
+                        for (j=0; j < cc_pays.length; j++) {
+                            if (cc_pays[j].from_bank === id) {
+                                line2.push(cc_pays[j]);
+                                count++;
+                                if (count == recent_number) {
+                                    break;
+                                }
+                            }
+                        }
+                        // put all into 1 dict and order by date
+                        var temp = {};
+                        var data_temp = [];
+                        for (j=0; j < line1.length; j++) {
+                            temp = {
+                                date_stamp: line1[j].date_stamp,
+                                amount: line1[j].amount
+                            };
+                            data_temp.push(temp);
+                        }
+                        for (j=0; j < line2.length; j++) {
+                            temp = {
+                                date_stamp: line2[j].date_stamp,
+                                amount: line2[j].amount
+                            };
+                            data_temp.push(temp);
+                        }
+                        // loop data temp and keep most recent 10
+                        data_temp.sort(function(a,b) {
+                           return b.date_stamp - a.date_stamp;
+                        });
+                        data = data_temp.slice(0,10);
                     }
                 }
             } else {

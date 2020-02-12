@@ -34,6 +34,7 @@ def show_d3(request):
     cc = CreditCard.objects.all()
     bank_line = BankLineItem.objects.all().order_by('-date_stamp')
     cc_line = CreditCardLineItem.objects.all().order_by('-date_stamp')
+    cc_pay = CreditCardPayment.objects.all().order_by('-date_stamp')
     output = []
     cats = []
     revs = []
@@ -41,6 +42,7 @@ def show_d3(request):
     ccs = []
     bank_lines = []
     cc_lines = []
+    cc_pays = []
     for item in items:
         add = model_to_dict(item)
         output.append(add)
@@ -120,6 +122,9 @@ def show_d3(request):
     for cl in cc_line:
         add = model_to_dict(cl)
         cc_lines.append(add)
+    for cp in cc_pay:
+        add = model_to_dict(cp)
+        cc_pays.append(add)
 
     context = {
         'expense': json.dumps(output, cls=DjangoJSONEncoder),
@@ -130,6 +135,7 @@ def show_d3(request):
         'credit_card': json.dumps(ccs, cls=DjangoJSONEncoder),
         'bank_lines': json.dumps(bank_lines, cls=DjangoJSONEncoder),
         'cc_lines': json.dumps(cc_lines, cls=DjangoJSONEncoder),
+        'cc_pays': json.dumps(cc_pays, cls=DjangoJSONEncoder),
         'data': data,
         'json_data': json.dumps(json_data),
         # 'line_items': output,
