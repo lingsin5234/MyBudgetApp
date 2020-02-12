@@ -11,9 +11,9 @@
         var factor = 70;
         var recent_number = 3;  // show recent # of transactions
 
-        // get min and max date - convert to milliseconds
-        minDate = d3.min(bank_lines, function(d) { return Date.parse(d.date_stamp); });
-        maxDate = d3.max(bank_lines, function(d) { return Date.parse(d.date_stamp); });
+        // set default min and max date - convert to milliseconds
+        minDate = Date.parse("2020-01-01");
+        maxDate = Date.parse("2020-02-01");
 
         // new svg function
         function add_info_box(data, account_type, main_svg, initial_height, factor) {
@@ -157,16 +157,24 @@
             var min_rev = get_min(accountData);
             var max_rev = get_max(accountData);
 
+            // get min and max dates
+            var minDate = d3.min(accountData, function(d) { return Date.parse(d.date_stamp); });
+            var maxDate = d3.max(accountData, function(d) { return Date.parse(d.date_stamp); });
+
             // print text to check
             //print_text
                 //.text(function(d) {return max_rev;});
 
             // reset the Y and X axis
-            x
-                .domain([0, 100]);
+            x_scale
+                .domain([minDate, maxDate]);
             show_graph.selectAll("g.x_axis")
                 .transition().duration(1000)
-                .call(d3.axisBottom(x));
+                .call(d3.axisBottom(x_scale)
+                    .tickFormat(d3.timeFormat("%Y-%m-%d")))
+                .selectAll("text")
+                .style("text-anchor", "end")
+                .attr("transform", "rotate(-65)");
             y
                 .domain([min_rev, max_rev]);
             show_graph.selectAll("g.y_axis")
@@ -183,7 +191,7 @@
             // plot the remaining dots
             dot
                 .transition().duration(1000)
-                .attr("cx", function(d) { return x(+d.id)+50 })
+                .attr("cx", function(d) { return x_scale(Date.parse(d.date_stamp))+50; })
                 .attr("cy", function(d) { return y(+d.amount)+10 })
                 .attr("r", 4).style("fill", "#2f7fef");
 
