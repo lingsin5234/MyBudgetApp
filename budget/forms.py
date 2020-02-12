@@ -36,7 +36,7 @@ class UploadRevCatForm(forms.ModelForm):
 class UploadBankAccountForm(forms.ModelForm):
     class Meta:
         model = BankAccount
-        fields = ['nickname', 'bank_name', 'account_type', 'balance']
+        fields = ['nickname', 'bank_name', 'account_type', 'balance', 'colour']
 
 
 class UploadRevenueForm(forms.ModelForm):

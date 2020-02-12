@@ -73,7 +73,7 @@
                 .attr("y", function(d,i) { return (i+1-0.95)*factor; })
                 .attr("height", factor-5)
                 .style("fill-opacity", 0)
-                .attr("class", "an_account")
+                .attr("class", account_type.toLowerCase().replace(/ /g, '_'))
                 .attr("id", function(d) { return d.nickname.replace(/ /g, ''); });
             return factor*(data.length+1);
         }
@@ -89,7 +89,7 @@
 
         // get max and min values
         function get_min(revs) {
-            var min = 1000000;
+            var min = revs[0].amount;
             for (i=0; i < revs.length; i++) {
                 if (min > revs[i].amount) {
                     min = revs[i].amount;
@@ -98,7 +98,7 @@
             return min;
         };
         function get_max(revs) {
-            var max = 0;
+            var max = revs[0].amount;
             for (i=0; i < revs.length; i++) {
                 if (max < revs[i].amount) {
                     max = revs[i].amount;
@@ -182,49 +182,54 @@
         };
 
         // get appropriate account
-        function get_data(whichAccount) {
+        function get_data(whichAccount, account_type) {
             var data = [];
-            //var id = 10;
-            //var id = bank_info[0].id;
-            //var id = bank_info[1].nickname.replace(/ /g, '')
-            //print_text
-                //.text(whichAccount + ' - ' + id + ': ' + bank_info.length);
-            // look thru bank accounts
-            for (i=0; i < bank_info.length; i++) {
-                check_str = bank_info[i].nickname.replace(/ /g, '');
-                if (check_str === whichAccount) {
-                    id = bank_info[i].id;
-                    for (j=0; j < bank_lines.length; j++) {
-                        if (bank_lines[j].to_transaction === id) {
-                            data.push(bank_lines[j]);
-                        } else if (bank_lines[j].from_transaction === id) {
-                            data.push(bank_lines[j]);
+
+            if (account_type === "bank") {
+                // look thru bank accounts
+                for (i=0; i < bank_info.length; i++) {
+                    check_str = bank_info[i].nickname.replace(/ /g, '');
+                    if (check_str === whichAccount) {
+                        id = bank_info[i].id;
+                        for (j=0; j < bank_lines.length; j++) {
+                            if (bank_lines[j].to_transaction === id) {
+                                data.push(bank_lines[j]);
+                            } else if (bank_lines[j].from_transaction === id) {
+                                data.push(bank_lines[j]);
+                            }
+                        }
+                    }
+                }
+            } else {
+                // look thru credit cards
+                for (i=0; i < credit_card.length; i++) {
+                    check_str = credit_card[i].nickname.replace(/ /g, '');
+                    if (check_str === whichAccount) {
+                        id = credit_card[i].id;
+                        for (j=0; j < cc_lines.length; j++) {
+                            if (cc_lines[j].to_transaction === id) {
+                                data.push(cc_lines[j]);
+                            } else if (cc_lines[j].from_transaction === id) {
+                                data.push(cc_lines[j]);
+                            }
                         }
                     }
                 }
             }
-            return data;
-            // look thru credit cards
-            for (i=0; i < credit_card.length; i++) {
-                if (credit_card[i].nickname.replace(/ /g, '') == whichAccount) {
-                    id = str(credit_card[i].id);
-                    print_text
-                        .text(function() {return id;});
-                    /*index = cc_lines.filter({ $0["id"] as! String == id }).first;
-                    data = cc_lines[index];
-                    return data;*/
-                }
-            }
 
-            return 0;
+            return data;
         };
 
-        // on click - the class
-        d3.selectAll(".an_account").on("click", function(d) {
+        // on click - the class bank_accounts
+        d3.selectAll(".bank_accounts").on("click", function(d) {
             var which_account = d3.select(this).property("id");
-            accountData = get_data(which_account, bank_info, credit_card);
-            //print_text
-                //.text(function() {return accountData;});
+            accountData = get_data(which_account, "bank");
+            updateChart(accountData);
+        })
+        // on click - the credit cards
+        d3.selectAll(".credit_cards").on("click", function(d) {
+            var which_account = d3.select(this).property("id");
+            accountData = get_data(which_account, "cc");
             updateChart(accountData);
         })
     </script>
