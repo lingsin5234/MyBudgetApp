@@ -116,13 +116,13 @@
         var margin = {top: 10, right: 50, bottom: 30, left: 50},
             width = 600 - margin.left - margin.right,
             height = 600 - margin.top - margin.bottom;
-        /*var print_text = show_graph.append("text")
+        var print_text = show_graph.append("text")
             .style("text-anchor", "middle")
-            .attr("x", 250).attr("y", 50)
+            .attr("x", 300).attr("y", 50)
             .attr("font-family", "roboto")
             .attr("font-size", "1em")
-            .attr("fill", "white")
-            .text(function(d) {return Date(minDate) + ' ' + maxDate;});*/
+            .attr("fill", "white");
+            //.text(function(d) {return Date(minDate) + ' ' + maxDate;});
         // add scale and then display X axis
         var x_scale = d3.scaleTime()
             .domain([minDate, maxDate])
@@ -147,10 +147,10 @@
         var dot = show_graph.selectAll('circle');
 
         // update function
-        function updateChart(accountData) {
-
-            // get the correct data sets, this will return as list of dict(s)
-            //data = bank_info.filter(obj => obj.name === whichAccount)
+        function updateChart(acc_data) {
+            // split the data array
+            accountData = acc_data[0];
+            accountName = acc_data[1];
 
             // get min and max values again
             var min_rev = get_min(accountData);
@@ -160,10 +160,6 @@
             var minDate = d3.min(accountData, function(d) { return Date.parse(d.date_stamp); });
             var maxDate = d3.max(accountData, function(d) { return Date.parse(d.date_stamp); });
 
-            // print text to check
-            //print_text
-                //.text(function(d) {return max_rev;});
-
             // reset the Y and X axis
             x_scale
                 .domain([minDate, maxDate]);
@@ -172,13 +168,17 @@
                 .call(d3.axisBottom(x_scale)
                     .tickFormat(d3.timeFormat("%Y-%m-%d")))
                 .selectAll("text")
-                .style("text-anchor", "end")
-                .attr("transform", "rotate(-65)");
+                    .style("text-anchor", "end")
+                    .attr("transform", "rotate(-65)");
             y
                 .domain([min_rev, max_rev]);
             show_graph.selectAll("g.y_axis")
                 .transition().duration(1000)
                 .call(d3.axisLeft(y));
+
+            // print title of selected account
+            print_text
+                .text(function() { return accountName; });
 
             // load the updated data
             dot = show_graph.selectAll("circle")
@@ -212,16 +212,17 @@
                     check_str = bank_info[i].nickname.replace(/ /g, '');
                     if (check_str === whichAccount) {
                         id = bank_info[i].id;
+                        acc_name = bank_info[i].nickname;
                         for (j=0; j < bank_lines.length; j++) {
                             if (bank_lines[j].to_transaction === id) {
                                 data.push(bank_lines[j]);
                                 if (data.length == recent_number) {
-                                    return data;
+                                    return [data, acc_name];
                                 }
                             } else if (bank_lines[j].from_transaction === id) {
                                 data.push(bank_lines[j]);
                                 if (data.length == recent_number) {
-                                    return data;
+                                    return [data, acc_name];
                                 }
                             }
                         }
@@ -233,11 +234,12 @@
                     check_str = credit_card[i].nickname.replace(/ /g, '');
                     if (check_str === whichAccount) {
                         id = credit_card[i].id;
+                        acc_name = credit_card[i].nickname;
                         for (j=0; j < cc_lines.length; j++) {
                             if (cc_lines[j].to_credit_card === id) {
                                 data.push(cc_lines[j]);
                                 if (data.length == recent_number) {
-                                    return data;
+                                    return [data, acc_name];
                                 }
                             }
                         }
@@ -245,7 +247,7 @@
                 }
             }
 
-            return data;
+            return [data, acc_name];
         };
 
         // on click - the class bank_accounts
