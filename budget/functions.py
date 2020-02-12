@@ -1,5 +1,6 @@
 # custom functions listed in this file
 from .models import BankAccount, RevCategory, CreditCard
+from decimal import Decimal
 
 
 # get bank line item form data from the revenue line item input
@@ -68,35 +69,35 @@ def update_bank_rev(data):
     # from Cash to Bank ==> a deposit
     if data['from_transaction'] == str(cash.id) and not(data['to_transaction'] == ''):
         bank = BankAccount.objects.get(id=int(data['to_transaction']))
-        cash.balance -= float(data['amount'])
-        bank.balance += float(data['amount'])
+        cash.balance -= Decimal(data['amount'])
+        bank.balance += Decimal(data['amount'])
         cash.save()
         bank.save()
 
     # from Bank to Cash ==> a Withdrawal
     elif not(data['from_transaction'] == '') and data['to_transaction'] == str(cash.id):
         bank = BankAccount.objects.get(id=int(data['from_transaction']))
-        bank.balance -= float(data['amount'])
-        cash.balance += float(data['amount'])
+        bank.balance -= Decimal(data['amount'])
+        cash.balance += Decimal(data['amount'])
         bank.save()
 
     # from '' to Cash ==> cash received
     elif data['from_transaction'] == '' and data['to_transaction'] == str(cash.id):
-        cash.balance += float(data['amount'])
+        cash.balance += Decimal(data['amount'])
         cash.save()
 
     # from '' to Bank ==> revenue received
     elif data['from_transaction'] == '' and not(data['to_transaction'] == ''):
         bank = BankAccount.objects.get(id=int(data['to_transaction']))
-        bank.balance += float(data['amount'])
+        bank.balance += Decimal(data['amount'])
         bank.save()
 
     # transfer between bank accounts
     else:
         bank1 = BankAccount.objects.get(id=int(data['from_transaction']))
         bank2 = BankAccount.objects.get(id=int(data['to_transaction']))
-        bank1.balance -= float(data['amount'])
-        bank2.balance += float(data['amount'])
+        bank1.balance -= Decimal(data['amount'])
+        bank2.balance += Decimal(data['amount'])
         bank1.save()
         bank2.save()
 
@@ -107,8 +108,8 @@ def update_bank_rev(data):
 def credit_card_payment(data):
     bank = BankAccount.objects.get(id=int(data['from_bank']))
     cc = CreditCard.objects.get(id=int(data['to_credit_card']))
-    bank.balance -= float(data['amount'])
-    cc.balance -= float(data['amount'])
+    bank.balance -= Decimal(data['amount'])
+    cc.balance -= Decimal(data['amount'])
     bank.save()
     cc.save()
     return
@@ -119,17 +120,17 @@ def update_bank_exp(data, pay_type):
     # cash expense
     if pay_type == 'cash':
         cash = BankAccount.objects.get(nickname="Cash")
-        cash.balance -= float(data['amount'])
+        cash.balance -= Decimal(data['amount'])
         cash.save()
     # debit expense
     elif pay_type == 'debit':
         bank = BankAccount.objects.get(id=int(data['to_transaction']))
-        bank.balance -= float(data['amount'])
+        bank.balance -= Decimal(data['amount'])
         bank.save()
     # credit expense - this one is ADD
     else:
         cc = CreditCard.objects.get(id=int(data['to_credit_card']))
-        cc.balance += float(data['amount'])
+        cc.balance += Decimal(data['amount'])
         cc.save()
 
     return

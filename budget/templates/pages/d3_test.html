@@ -92,26 +92,6 @@
             .attr("y", 0.05*factor).attr("height", 700);
         var show_graph = graph_space.append("g");
 
-        // get max and min values
-        function get_min(revs) {
-            var min = revs[0].amount;
-            for (i=0; i < revs.length; i++) {
-                if (min > revs[i].amount) {
-                    min = revs[i].amount;
-                }
-            }
-            return min;
-        };
-        function get_max(revs) {
-            var max = revs[0].amount;
-            for (i=0; i < revs.length; i++) {
-                if (max < revs[i].amount) {
-                    max = revs[i].amount;
-                }
-            }
-            return max;
-        };
-
         // set the dimensions and margins of the graph
         var margin = {top: 10, right: 50, bottom: 30, left: 50},
             width = 600 - margin.left - margin.right,
@@ -152,9 +132,9 @@
             accountData = acc_data[0];
             accountName = acc_data[1];
 
-            // get min and max values again
-            var min_rev = get_min(accountData);
-            var max_rev = get_max(accountData);
+            // get min and max values
+            var minAmount = d3.min(accountData, function(d) { return parseFloat(d.amount); });
+            var maxAmount = d3.max(accountData, function(d) { return parseFloat(d.amount); });
 
             // get min and max dates
             var minDate = d3.min(accountData, function(d) { return Date.parse(d.date_stamp); });
@@ -171,14 +151,17 @@
                     .style("text-anchor", "end")
                     .attr("transform", "rotate(-65)");
             y
-                .domain([min_rev, max_rev]);
+                .domain([minAmount, maxAmount])
+                .range([height,0]);
             show_graph.selectAll("g.y_axis")
                 .transition().duration(1000)
                 .call(d3.axisLeft(y));
 
             // print title of selected account
             print_text
-                .text(function() { return accountName; });
+                .text(function() { return accountData[1].amount; });
+                //.text(function() { return accountName + ' - ' + accountData.length
+                //+ ' ' + minAmount + ' ' + maxAmount; });
 
             // load the updated data
             dot = show_graph.selectAll("circle")
