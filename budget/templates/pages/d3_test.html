@@ -9,7 +9,7 @@
         var main_svg = d3.select("body").append("svg")
             .attr("width", 1100).attr("height", 2200);
         var factor = 70;
-        var recent_number = 10;  // show recent 10 transactions
+        var recent_number = 3;  // show recent # of transactions
 
         // new svg function
         function add_info_box(data, account_type, main_svg, initial_height, factor) {
@@ -197,10 +197,12 @@
                                 data.push(bank_lines[j]);
                                 if (data.length == recent_number) {
                                     return data;
+                                }
                             } else if (bank_lines[j].from_transaction === id) {
                                 data.push(bank_lines[j]);
                                 if (data.length == recent_number) {
                                     return data;
+                                }
                             }
                         }
                     }
@@ -220,6 +222,9 @@
                                 print_text
                                     .text(function() {return typeof cc_lines[j].to_credit_card;});
                                 data.push(cc_lines[j]);
+                                if (data.length == recent_number) {
+                                    return data;
+                                }
                             }
                         }
                     }
