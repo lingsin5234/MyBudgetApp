@@ -136,6 +136,7 @@
             // get min and max values
             var minAmount = d3.min(accountData, function(d) { return parseFloat(d.amount); });
             var maxAmount = d3.max(accountData, function(d) { return parseFloat(d.amount); });
+            if (maxAmount - 1000 < 0) { minAmount = 0; }
 
             // get min and max dates
             var minDate = d3.min(accountData, function(d) { return Date.parse(d.date_stamp); });
@@ -153,14 +154,18 @@
                     .attr("transform", "rotate(-65)");
             y
                 .domain([minAmount, maxAmount])
-                .range([height,0]);
+                .range([height,0])
+                .nice();
+            stepValue = (maxAmount - minAmount) / (8 - 1);
+            tickValues = d3.range(minAmount, maxAmount + stepValue, stepValue);
             show_graph.selectAll("g.y_axis")
                 .transition().duration(1000)
-                .call(d3.axisLeft(y));
+                .call(d3.axisLeft(y).tickValues(tickValues));
 
             // print title of selected account
             print_text
                 //.text(function() { return accountData[1].amount; });
+                //.text(function() { return accountName + ' - ' + tickValues; });
                 .text(function() { return accountName + ' - ' + accountData.length; });
                 //+ ' ' + minAmount + ' ' + maxAmount; });
 
