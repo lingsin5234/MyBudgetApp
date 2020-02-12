@@ -11,7 +11,7 @@
         var factor = 70;
         var recent_number = 3;  // show recent # of transactions
 
-        // get min and max date
+        // get min and max date - convert to milliseconds
         minDate = d3.min(bank_lines, function(d) { return Date.parse(d.date_stamp); });
         maxDate = d3.max(bank_lines, function(d) { return Date.parse(d.date_stamp); });
 
@@ -124,15 +124,9 @@
             .attr("fill", "white")
             .text(function(d) {return Date(minDate) + ' ' + maxDate;});
         // add scale and then display X axis
-        var mindate = new Date(2012,0,1),
-            maxdate = new Date(2012,0,31);
-
         var x_scale = d3.scaleTime()
-            .domain([mindate, maxdate])
-            .range([width, 0]);  // reverse order from [0, width]
-        //var x = d3.svg.axis()
-            //.orient("bottom")
-            //.scale(x_scale);
+            .domain([minDate, maxDate])
+            .range([0, width]);
         show_graph.append("g")
             .attr("transform", "translate(50," + (height+10) + ")")
             .attr("class", "x_axis")
@@ -141,8 +135,6 @@
             .selectAll("text")
                 .style("text-anchor", "end")
                 .attr("transform", "rotate(-65)");
-        print_text
-            .text(function() {return x_scale; });
         // add the Y axis
         var y = d3.scaleLinear()
             .domain([0,1000])
