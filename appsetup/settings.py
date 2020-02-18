@@ -159,8 +159,13 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
-        'file': {
+        'fileERROR': {
             'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': 'c:/users/sinto/documents/pycharmprojects/mybudget/appsetup/log/debug.log',
+        },
+        'fileWARN': {
+            'level': 'WARNING',
             'class': 'logging.FileHandler',
             'filename': 'c:/users/sinto/documents/pycharmprojects/mybudget/appsetup/log/debug.log',
         },
@@ -171,19 +176,14 @@ LOGGING = {
     #     }
     # },
     'loggers': {
-        'budget': {
-            'handlers': ['file'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-        'budget': {
-            'handlers': ['file'],
+        'django': {
+            'handlers': ['fileERROR', 'fileWARN'],
             'level': 'WARNING',
             'propagate': True,
         },
         # maybe delete later?
         'django.security.DisallowedHost': {
-            'handlers': ['file'],
+            'handlers': ['fileERROR'],
             'propagate': True,
         }
     },

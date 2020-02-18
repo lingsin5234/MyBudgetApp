@@ -142,6 +142,7 @@ def show_d3(request):
         'type': output[0]
         # 'expenses': json.dumps(expenses)
     }
+    raise Exception('Make response code 500!')
     return render(request, 'pages/d3_test.html', context)
 
 
