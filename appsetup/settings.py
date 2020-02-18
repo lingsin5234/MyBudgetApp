@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '*mud=s7q$k54&4ihm$6g(ik!#_g(+yu)lfxt@w^&s%&1mjj57g'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['138.197.138.227']
+ALLOWED_HOSTS = ['138.197.138.227', 'localhost']
 
 # setup email
 EMAIL_HOST = 'smtp.gmail.com'
@@ -58,7 +58,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'djangoapps.urls'
+ROOT_URLCONF = 'appsetup.urls'
 
 TEMPLATES = [
     {
@@ -76,7 +76,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'djangoapps.wsgi.application'
+WSGI_APPLICATION = 'appsetup.wsgi.application'
 
 
 # Database
@@ -157,24 +157,34 @@ ADMINS = [('Sinto', 'sinto.ling@gmail.com')]
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
+    'disable_existing_loggers': False,
     'handlers': {
         'file': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
-            'filename': '/home/sinto/django/log/debug.log',
+            'filename': 'c:/users/sinto/documents/pycharmprojects/mybudget/appsetup/log/debug.log',
         },
     },
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse',
-        }
-    },
+    # 'filters': {
+    #     'require_debug_false': {
+    #         '()': 'django.utils.log.RequireDebugFalse',
+    #     }
+    # },
     'loggers': {
         'budget': {
             'handlers': ['file'],
             'level': 'ERROR',
             'propagate': True,
         },
+        'budget': {
+            'handlers': ['file'],
+            'level': 'WARNING',
+            'propagate': True,
+        },
+        # maybe delete later?
+        'django.security.DisallowedHost': {
+            'handlers': ['file'],
+            'propagate': True,
+        }
     },
 }
