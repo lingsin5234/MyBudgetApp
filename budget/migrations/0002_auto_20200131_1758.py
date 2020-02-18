@@ -21,6 +21,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='lineitem',
             name='category',
-            field=models.OneToOneField(default='Uncategorized', on_delete=django.db.models.deletion.SET_DEFAULT, to='budget.Category'),
+            field=models.OneToOneField(default=0, on_delete=django.db.models.deletion.SET_DEFAULT, to='budget.Category'),
         ),
     ]

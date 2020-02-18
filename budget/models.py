@@ -40,7 +40,7 @@ class RevCategory(models.Model):
 # Line Item
 class LineItem(models.Model):
     name = models.CharField(max_length=30)
-    category = models.OneToOneField(ExpCategory, on_delete=models.SET_DEFAULT, default='Uncategorized')
+    category = models.OneToOneField(ExpCategory, on_delete=models.SET_DEFAULT, default=0)
     date_stamp = models.DateField()
     amount = models.DecimalField(decimal_places=2, max_digits=9)
 
@@ -93,7 +93,7 @@ class BankAccount(models.Model):
 class ExpenseLineItem(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=30)
-    category = models.ForeignKey(ExpCategory, on_delete=models.SET_DEFAULT, default='Uncategorized')
+    category = models.ForeignKey(ExpCategory, on_delete=models.SET_DEFAULT, default=0)
     pay_type = models.CharField(max_length=6, choices=PAY_TYPE)
     card_name = models.ForeignKey(CreditCard, on_delete=models.SET_NULL, null=True, blank=True, default=None)
     bank_account = models.ForeignKey(BankAccount, on_delete=models.SET_NULL, null=True, blank=True, default=None)
@@ -117,7 +117,7 @@ class ExpenseLineItem(models.Model):
 class RevenueLineItem(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=30)
-    category = models.ForeignKey(RevCategory, on_delete=models.SET_DEFAULT, default='Uncategorized')
+    category = models.ForeignKey(RevCategory, on_delete=models.SET_DEFAULT, default=0)
     cash_debit = models.CharField(max_length=5, choices=CASH_DEBIT)
     bank_account = models.ForeignKey(BankAccount, null=True, on_delete=models.SET_NULL)
     date_stamp = models.DateField()

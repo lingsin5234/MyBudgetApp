@@ -37,8 +37,8 @@ class Migration(migrations.Migration):
                 ('cash_debit', models.CharField(max_length=10)),
                 ('date_stamp', models.DateField()),
                 ('amount', models.FloatField()),
-                ('bank_account', models.ForeignKey(default='Missing Bank', on_delete=django.db.models.deletion.SET_DEFAULT, to='budget.BankAccount')),
-                ('category', models.ForeignKey(default='Uncategorized', on_delete=django.db.models.deletion.SET_DEFAULT, to='budget.RevCategory')),
+                ('bank_account', models.ForeignKey(default=0, on_delete=django.db.models.deletion.SET_DEFAULT, to='budget.BankAccount')),
+                ('category', models.ForeignKey(default=0, on_delete=django.db.models.deletion.SET_DEFAULT, to='budget.RevCategory')),
             ],
         ),
     ]

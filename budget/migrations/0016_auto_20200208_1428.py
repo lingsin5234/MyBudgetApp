@@ -14,11 +14,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='creditcardpayment',
             name='from_bank',
-            field=models.ForeignKey(default='_defunct_acct', on_delete=django.db.models.deletion.SET_DEFAULT, to='budget.BankAccount'),
+            field=models.ForeignKey(default=0, on_delete=django.db.models.deletion.SET_DEFAULT, to='budget.BankAccount'),
         ),
         migrations.AlterField(
             model_name='creditcardpayment',
             name='to_credit_card',
-            field=models.ForeignKey(default='_defunct_cc', on_delete=django.db.models.deletion.SET_DEFAULT, to='budget.CreditCard'),
+            field=models.ForeignKey(default=0, on_delete=django.db.models.deletion.SET_DEFAULT, to='budget.CreditCard'),
         ),
     ]

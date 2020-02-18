@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ('date_stamp', models.DateField()),
                 ('amount', models.FloatField()),
                 ('card_name', models.OneToOneField(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='budget.CreditCard')),
-                ('category', models.OneToOneField(default='Uncategorized', on_delete=django.db.models.deletion.SET_DEFAULT, to='budget.Category')),
+                ('category', models.OneToOneField(default=0, on_delete=django.db.models.deletion.SET_DEFAULT, to='budget.Category')),
             ],
         ),
     ]

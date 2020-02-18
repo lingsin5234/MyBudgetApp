@@ -19,6 +19,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='expenselineitem',
             name='category',
-            field=models.ForeignKey(default='Uncategorized', on_delete=django.db.models.deletion.SET_DEFAULT, to='budget.Category'),
+            field=models.ForeignKey(default=0, on_delete=django.db.models.deletion.SET_DEFAULT, to='budget.Category'),
         ),
     ]

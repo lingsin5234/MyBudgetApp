@@ -17,8 +17,8 @@ class Migration(migrations.Migration):
                 ('id', models.IntegerField(primary_key=True, serialize=False)),
                 ('amount', models.FloatField()),
                 ('date_stamp', models.DateField()),
-                ('from_bank', models.ForeignKey(default='Defunct', on_delete=django.db.models.deletion.SET_DEFAULT, to='budget.BankAccount')),
-                ('to_credit_card', models.ForeignKey(default='Defunct', on_delete=django.db.models.deletion.SET_DEFAULT, to='budget.CreditCard')),
+                ('from_bank', models.ForeignKey(default=0, on_delete=django.db.models.deletion.SET_DEFAULT, to='budget.BankAccount')),
+                ('to_credit_card', models.ForeignKey(default=0, on_delete=django.db.models.deletion.SET_DEFAULT, to='budget.CreditCard')),
             ],
         ),
     ]
