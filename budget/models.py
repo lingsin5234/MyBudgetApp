@@ -11,7 +11,6 @@ PAY_TYPE = [('cash', 'cash'),
 
 # Expense Category
 class ExpCategory(models.Model):
-    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=20)
     colour = models.CharField(max_length=7, null=True, default=None)
 
@@ -25,7 +24,6 @@ class ExpCategory(models.Model):
 
 # Revenue Category
 class RevCategory(models.Model):
-    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=20)
     colour = models.CharField(max_length=7, null=True, default=None)
 
@@ -56,7 +54,6 @@ class LineItem(models.Model):
 
 # Credit Card
 class CreditCard(models.Model):
-    id = models.IntegerField(primary_key=True)
     nickname = models.CharField(max_length=15, null=True, blank=True, default=None)
     colour = models.CharField(max_length=7, null=True, default=None)
     balance = models.DecimalField(default=0, decimal_places=2, max_digits=9)
@@ -71,7 +68,6 @@ class CreditCard(models.Model):
 
 # Bank Account / Cash
 class BankAccount(models.Model):
-    id = models.IntegerField(primary_key=True)
     nickname = models.CharField(max_length=15, unique=True)
     bank_name = models.CharField(max_length=15, null=True, blank=True, default=None)
     account_type = models.CharField(max_length=15)
@@ -114,7 +110,6 @@ class ExpenseLineItem(models.Model):
 
 # Revenue Line Item
 class RevenueLineItem(models.Model):
-    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=30)
     category = models.ForeignKey(RevCategory, on_delete=models.SET_DEFAULT, default=0)
     cash_debit = models.CharField(max_length=5, choices=CASH_DEBIT)
@@ -136,7 +131,6 @@ class RevenueLineItem(models.Model):
 
 # Bank Account Transactional Items
 class BankLineItem(models.Model):
-    id = models.IntegerField(primary_key=True)
     amount = models.DecimalField(decimal_places=2, max_digits=9)
     from_transaction = models.ForeignKey(BankAccount, null=True, blank=True,
                                          on_delete=models.SET_NULL, related_name='_unused_1')
@@ -151,7 +145,6 @@ class BankLineItem(models.Model):
 
 # Credit Card Account Transactional Items
 class CreditCardLineItem(models.Model):
-    id = models.IntegerField(primary_key=True)
     amount = models.DecimalField(decimal_places=2, max_digits=9)
     to_credit_card = models.ForeignKey(CreditCard, null=True, on_delete=models.SET_NULL)
     date_stamp = models.DateField()
@@ -163,7 +156,6 @@ class CreditCardLineItem(models.Model):
 
 # Credit Card Payment
 class CreditCardPayment(models.Model):
-    id = models.IntegerField(primary_key=True)
     amount = models.DecimalField(decimal_places=2, max_digits=9)
     from_bank = models.ForeignKey(BankAccount, null=True, on_delete=models.SET_NULL)
     to_credit_card = models.ForeignKey(CreditCard, null=True, on_delete=models.SET_NULL)
