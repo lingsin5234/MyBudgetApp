@@ -148,7 +148,7 @@ def show_d3(request):
     }
     # logger.exception("Bad Request 404")
     # return HttpResponseBadRequest("404")
-    raise Exception('Make response code 500!')
+    # raise Exception('Make response code 500!')
     return render(request, 'pages/d3_test.html', context)
 
 
@@ -157,101 +157,110 @@ def upload_data(request, upload_type):
     # default upload_name
     upload_name = 'Expense Item'
 
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        if upload_type == 'expense':
-            form = UploadExpenseForm(request.POST)
-        elif upload_type == 'credit_card':
-            upload_name = 'Credit Card'
-            form = UploadCreditCardForm(request.POST)
-        elif upload_type == 'exp_category':
-            upload_name = 'Expense Category'
-            form = UploadExpCatForm(request.POST)
-        elif upload_type == 'revenue':
-            upload_name = 'Revenue Item'
-            form = UploadRevenueForm(request.POST)
-        elif upload_type == 'rev_category':
-            upload_name = 'Revenue Category'
-            form = UploadRevCatForm(request.POST)
-        elif upload_type == 'bank_account':
-            upload_name = 'Bank Account'
-            form = UploadBankAccountForm(request.POST)
-        elif upload_type == 'pay_cc':
-            upload_name = 'Credit Card Payment'
-            form = UploadCreditCardPaymentForm(request.POST)
-        else:
-            upload_name = 'Line Item'
-            form = UploadLineItemForm(request.POST)
-
-        # check whether it's valid:
-        if form.is_valid():
-
-            # check if it's expense or revenue line item
+    try:
+        # if this is a POST request we need to process the form data
+        if request.method == 'POST':
+            # create a form instance and populate it with data from the request:
             if upload_type == 'expense':
-                # expense then get corresponding bank/cc form
-                exp_data = get_exp_data(request.POST)
-                if request.POST['pay_type'] == 'cash' or request.POST['pay_type'] == 'debit':
-                    form2 = UploadBankLineItemForm(exp_data)
-                else:
-                    form2 = UploadCreditCardLineItemForm(exp_data)
-
-                if form2.is_valid():
-                    # proceed to edit the appropriate account!
-                    update_bank_exp(exp_data, request.POST['pay_type'])
-                    form2.save()
-                else:
-                    HttpResponse('<h1>Bank Line Item Form error</h1>')
+                try:
+                    form = UploadExpenseForm(request.POST)
+                except Exception as exp:
+                    logging.error(exp)
+                    return HttpResponse(exp, status=400)
+            elif upload_type == 'credit_card':
+                upload_name = 'Credit Card'
+                form = UploadCreditCardForm(request.POST)
+            elif upload_type == 'exp_category':
+                upload_name = 'Expense Category'
+                form = UploadExpCatForm(request.POST)
             elif upload_type == 'revenue':
-                # revenue then get rev data then submit bank form
-                rev_data = get_rev_data(request.POST)
-                # return HttpResponse('<p>' + str(rev_data) + '</p><p>' + request.POST['category'] + '</p>')
-                form2 = UploadBankLineItemForm(rev_data)
-
-                if form2.is_valid():
-                    # proceed to edit the bank accounts!
-                    update_bank_rev(rev_data)
-                    form2.save()
-                else:
-                    HttpResponse('<h1>Bank Line Item Form error</h1>')
+                upload_name = 'Revenue Item'
+                form = UploadRevenueForm(request.POST)
+            elif upload_type == 'rev_category':
+                upload_name = 'Revenue Category'
+                form = UploadRevCatForm(request.POST)
+            elif upload_type == 'bank_account':
+                upload_name = 'Bank Account'
+                form = UploadBankAccountForm(request.POST)
             elif upload_type == 'pay_cc':
-                credit_card_payment(request.POST)
-            # still need to save the first form
-            form.save()
-            # redirect to a new URL:
-            return HttpResponseRedirect('/upload_done/' + upload_type + '/')
+                upload_name = 'Credit Card Payment'
+                form = UploadCreditCardPaymentForm(request.POST)
+            else:
+                upload_name = 'Line Item'
+                form = UploadLineItemForm(request.POST)
 
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        if upload_type == 'expense':
-            form = UploadExpenseForm()
-        elif upload_type == 'credit_card':
-            upload_name = 'Credit Card'
-            form = UploadCreditCardForm()
-        elif upload_type == 'exp_category':
-            upload_name = 'Expense Category'
-            form = UploadExpCatForm()
-        elif upload_type == 'revenue':
-            upload_name = 'Revenue Item'
-            form = UploadRevenueForm()
-        elif upload_type == 'rev_category':
-            upload_name = 'Revenue Category'
-            form = UploadRevCatForm()
-        elif upload_type == 'bank_account':
-            upload_name = 'Bank Account'
-            form = UploadBankAccountForm()
-        elif upload_type == 'pay_cc':
-            upload_name = 'Credit Card Payment'
-            form = UploadCreditCardPaymentForm()
+            # check whether it's valid:
+            if form.is_valid():
+
+                # check if it's expense or revenue line item
+                if upload_type == 'expense':
+                    # expense then get corresponding bank/cc form
+                    exp_data = get_exp_data(request.POST)
+                    if request.POST['pay_type'] == 'cash' or request.POST['pay_type'] == 'debit':
+                        form2 = UploadBankLineItemForm(exp_data)
+                    else:
+                        form2 = UploadCreditCardLineItemForm(exp_data)
+
+                    if form2.is_valid():
+                        # proceed to edit the appropriate account!
+                        update_bank_exp(exp_data, request.POST['pay_type'])
+                        form2.save()
+                    else:
+                        HttpResponse('<h1>Bank Line Item Form error</h1>')
+                elif upload_type == 'revenue':
+                    # revenue then get rev data then submit bank form
+                    rev_data = get_rev_data(request.POST)
+                    # return HttpResponse('<p>' + str(rev_data) + '</p><p>' + request.POST['category'] + '</p>')
+                    form2 = UploadBankLineItemForm(rev_data)
+
+                    if form2.is_valid():
+                        # proceed to edit the bank accounts!
+                        update_bank_rev(rev_data)
+                        form2.save()
+                    else:
+                        HttpResponse('<h1>Bank Line Item Form error</h1>')
+                elif upload_type == 'pay_cc':
+                    credit_card_payment(request.POST)
+                # still need to save the first form
+                form.save()
+                # redirect to a new URL:
+                return HttpResponseRedirect('/upload_done/' + upload_type + '/')
+
+        # if a GET (or any other method) we'll create a blank form
         else:
-            upload_name = 'Line Item'
-            form = UploadLineItemForm
+            if upload_type == 'expense':
+                form = UploadExpenseForm()
+            elif upload_type == 'credit_card':
+                upload_name = 'Credit Card'
+                form = UploadCreditCardForm()
+            elif upload_type == 'exp_category':
+                upload_name = 'Expense Category'
+                form = UploadExpCatForm()
+            elif upload_type == 'revenue':
+                upload_name = 'Revenue Item'
+                form = UploadRevenueForm()
+            elif upload_type == 'rev_category':
+                upload_name = 'Revenue Category'
+                form = UploadRevCatForm()
+            elif upload_type == 'bank_account':
+                upload_name = 'Bank Account'
+                form = UploadBankAccountForm()
+            elif upload_type == 'pay_cc':
+                upload_name = 'Credit Card Payment'
+                form = UploadCreditCardPaymentForm()
+            else:
+                upload_name = 'Line Item'
+                form = UploadLineItemForm
 
-    context = {
-        'form': form,
-        'upload_type': upload_type,
-        'upload_name': upload_name
-    }
+        context = {
+            'form': form,
+            'upload_type': upload_type,
+            'upload_name': upload_name
+        }
+
+    except Exception as exp:
+        logging.error(exp)
+        return HttpResponse(exp, status=400)
 
     return render(request, 'pages/upload.html', context)
 

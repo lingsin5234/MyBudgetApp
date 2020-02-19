@@ -157,44 +157,47 @@ ADMINS = [('Sinto', 'sinto.ling@gmail.com')]
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'formatters': {
+        'django.server': {
+            '()': 'django.utils.log.ServerFormatter',
+            'format': '[%(server_time)s] %(message)s',
+        }
+    },
     'handlers': {
-        'fileWARN': {
-            'level': 'WARNING',
-            'class': 'logging.FileHandler',
-            'filename': 'c:/users/sinto/documents/pycharmprojects/mybudget/appsetup/log/debug_warn.log',
+        'console': {
+            'level': 'INFO',
+            'filters': ['require_debug_false'],
+            'class': 'logging.StreamHandler',
         },
-        'fileERROR': {
-            'level': 'ERROR',
-            'class': 'logging.FileHandler',
-            'filename': 'c:/users/sinto/documents/pycharmprojects/mybudget/appsetup/log/debug.log',
+        'django.server': {
+            'level': 'INFO',
+            'filters': ['require_debug_false'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'django.server',
         },
-        'emailERROR': {
+        'mail_admins': {
             'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler',
-            'include_html': True,
+            'filters': ['require_debug_true'],  # fix later
+            'class': 'django.utils.log.AdminEmailHandler'
         }
     },
-    # 'filters': {
-    #     'require_debug_false': {
-    #         '()': 'django.utils.log.RequireDebugFalse',
-    #     }
-    # },
     'loggers': {
-        'django-warning': {
-            'handlers': ['fileWARN'],
-            'level': 'WARNING',
-            'propagate': True,
-        },
         'django': {
-            'handlers': ['fileERROR'],  # , 'emailERROR'],
-            'level': 'ERROR',
-            'propagate': True,
+            'handlers': ['console', 'mail_admins'],
+            'level': 'INFO',
         },
-        # maybe delete later?
-        'django.security.DisallowedHost': {
-            'handlers': ['fileERROR'],
-            'propagate': True,
-        }
-    },
+        'django.server': {
+            'handlers': ['django.server'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    }
 }

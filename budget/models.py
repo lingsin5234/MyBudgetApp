@@ -91,7 +91,6 @@ class BankAccount(models.Model):
 
 # Expenses Line Item
 class ExpenseLineItem(models.Model):
-    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=30)
     category = models.ForeignKey(ExpCategory, on_delete=models.SET_DEFAULT, default=0)
     pay_type = models.CharField(max_length=6, choices=PAY_TYPE)
