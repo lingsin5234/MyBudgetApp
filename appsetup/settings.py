@@ -159,16 +159,21 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
+        'fileWARN': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': 'c:/users/sinto/documents/pycharmprojects/mybudget/appsetup/log/debug_warn.log',
+        },
         'fileERROR': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
             'filename': 'c:/users/sinto/documents/pycharmprojects/mybudget/appsetup/log/debug.log',
         },
-        'fileWARN': {
-            'level': 'WARNING',
-            'class': 'logging.FileHandler',
-            'filename': 'c:/users/sinto/documents/pycharmprojects/mybudget/appsetup/log/debug.log',
-        },
+        'emailERROR': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'include_html': True,
+        }
     },
     # 'filters': {
     #     'require_debug_false': {
@@ -176,9 +181,14 @@ LOGGING = {
     #     }
     # },
     'loggers': {
-        'django': {
-            'handlers': ['fileERROR', 'fileWARN'],
+        'django-warning': {
+            'handlers': ['fileWARN'],
             'level': 'WARNING',
+            'propagate': True,
+        },
+        'django': {
+            'handlers': ['fileERROR'],  # , 'emailERROR'],
+            'level': 'ERROR',
             'propagate': True,
         },
         # maybe delete later?
