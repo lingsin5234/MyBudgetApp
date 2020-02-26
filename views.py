@@ -297,3 +297,26 @@ def upload_done(request, upload_type):
         'item': item
     }
     return render(request, 'pages/upload_done.html', context)
+
+
+# show the categories
+def show_category(request, cat_type):
+
+    # either revenue or expense
+    if cat_type == 'revenue':
+        cat = RevCategory.objects.all()
+    else:
+        cat = ExpCategory.objects.all()
+
+    # convert to dict to use JSON
+    cats = []
+    for c in cat:
+        add = model_to_dict(c)
+        cats.append(add)
+
+    context = {
+        'cats': json.dumps(cats),
+        'cat_type': cat_type
+    }
+    return render(request, 'pages/show_cats.html', context)
+
