@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
 from .models import LineItem, ExpCategory, CreditCard, ExpenseLineItem
 from .models import BankLineItem, CreditCardLineItem
 from .models import RevCategory, BankAccount, RevenueLineItem, CreditCardPayment
@@ -12,6 +12,9 @@ import json
 from django.forms.models import model_to_dict
 from .functions import get_exp_data, get_rev_data, update_bank_rev, credit_card_payment, update_bank_exp
 import logging
+
+# create logger instance
+# logger = logging.getLogger(__name__)
 
 
 # line item test view
@@ -143,6 +146,9 @@ def show_d3(request):
         'type': output[0]
         # 'expenses': json.dumps(expenses)
     }
+    # logger.exception("Bad Request 404")
+    # return HttpResponseBadRequest("404")
+    # raise Exception('Make response code 500!')
     return render(request, 'pages/d3_test.html', context)
 
 
@@ -151,13 +157,12 @@ def upload_data(request, upload_type):
     # default upload_name
     upload_name = 'Expense Item'
 
-    try: 
-        
+    try:
         # if this is a POST request we need to process the form data
         if request.method == 'POST':
             # create a form instance and populate it with data from the request:
             if upload_type == 'expense':
-                try: 
+                try:
                     form = UploadExpenseForm(request.POST)
                 except Exception as exp:
                     logging.error(exp)
@@ -252,7 +257,7 @@ def upload_data(request, upload_type):
             'upload_type': upload_type,
             'upload_name': upload_name
         }
-    
+
     except Exception as exp:
         logging.error(exp)
         return HttpResponse(exp, status=400)
