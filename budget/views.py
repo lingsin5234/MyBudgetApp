@@ -301,13 +301,21 @@ def upload_done(request, upload_type):
 
 # show the categories
 def show_category(request, cat_type):
+
+    # either revenue or expense
     if cat_type == 'revenue':
-        cats = RevCategory.objects.all()
+        cat = RevCategory.objects.all()
     else:
-        cats = ExpCategory.objects.all()
+        cat = ExpCategory.objects.all()
+
+    # convert to dict to use JSON
+    cats = []
+    for c in cat:
+        add = model_to_dict(c)
+        cats.append(add)
 
     context = {
-        'cats': cats,
+        'cats': json.dumps(cats),
         'cat_type': cat_type
     }
     return render(request, 'pages/show_cats.html', context)

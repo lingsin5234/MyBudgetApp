@@ -1,10 +1,29 @@
 {% include 'partials/header.html' %}
-    <h1>Show {{cat_type}} Categories</h1>
+    <h1>{{cat_type}} categories</h1>
 
-    <ul>
-        {% for c in cats %}
-        <li>{{c}}</li>
-        {% endfor %}
-    </ul>
+    <script>
+        var cats = JSON.parse('{{cats|safe}}');
+        var factor = 70;
+        var svg = d3.select("body").append("svg")
+            .attr("width", 500).attr("height", 200*cats.length);
+        // create group element
+        var groups = svg.selectAll("g")
+            .data(cats).enter().append("g");
+        // initial box
+        var each_box = groups.append("rect")
+            .attr("x", 10).attr("width", 250)
+            .attr("y", function(d,i) { return (i+1-0.95)*factor; })
+            .attr("height", factor-5)
+            .style("fill", function(d) { return d.colour; });
+        // box name
+        var box_name = groups.append("text")
+            .style("text-anchor", "middle")
+            .attr("x", 135)
+            .attr("y", function(d,i) { return (i+1-0.4)*factor; })
+            .attr("font-family", "roboto")
+            .attr("font-size", "1.25em")
+            .attr("fill", "white")
+            .text(function(d) { return d.name; });
+    </script>
 
 {% include 'partials/footer.html' %}
