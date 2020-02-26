@@ -1,0 +1,10 @@
+{% include 'partials/header.html' %}
+    <h1>Show {{cat_type}} Categories</h1>
+
+    <ul>
+        {% for c in cats %}
+        <li>{{c}}</li>
+        {% endfor %}
+    </ul>
+
+{% include 'partials/footer.html' %}

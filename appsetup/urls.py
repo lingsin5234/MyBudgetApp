@@ -25,4 +25,5 @@ urlpatterns = [
     re_path(r'^upload/(?P<upload_type>[\w_]+)/$', budget_views.upload_data),
     re_path(r'^upload_done/(?P<upload_type>[\w_]+)/$', budget_views.upload_done),
     re_path(r'^d3_test/', budget_views.show_d3),
+    re_path(r'^show_cat/(?P<cat_type>[\w_]+)/$', budget_views.show_category)
 ]

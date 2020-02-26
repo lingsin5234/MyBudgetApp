@@ -297,3 +297,18 @@ def upload_done(request, upload_type):
         'item': item
     }
     return render(request, 'pages/upload_done.html', context)
+
+
+# show the categories
+def show_category(request, cat_type):
+    if cat_type == 'revenue':
+        cats = RevCategory.objects.all()
+    else:
+        cats = ExpCategory.objects.all()
+
+    context = {
+        'cats': cats,
+        'cat_type': cat_type
+    }
+    return render(request, 'pages/show_cats.html', context)
+
