@@ -147,7 +147,7 @@ STATIC_URL = '/static/'
 
 # debugging Admin CSS in production
 
-STATIC_ROOT = 'static'
+# STATIC_ROOT = 'static'
 
 # ADMIN setting for live site error logging sent by email
 

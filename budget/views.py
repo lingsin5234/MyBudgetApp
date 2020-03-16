@@ -19,10 +19,38 @@ import logging
 
 # line item test view
 def show_data(request):
-    items = LineItem.objects.all()
+    exps = ExpenseLineItem.objects.all().order_by('-date_stamp')
+    exp_cat = ExpCategory.objects.all()
+    revs = RevenueLineItem.objects.all().order_by('-date_stamp')
+    rev_cat = RevCategory.objects.all()
+
+    exp_cats = []
+    for e in exp_cat:
+        add = model_to_dict(e)
+        exp_cats.append(add)
+
+    rev_cats = []
+    for e in rev_cat:
+        add = model_to_dict(e)
+        rev_cats.append(add)
+
+    expense = []
+    for i in exps:
+        add = model_to_dict(i)
+        cat_index = add['category']
+        add['category'] = exp_cats[cat_index]['name']
+        expense.append(add)
+
+    revenue = []
+    for i in revs:
+        add = model_to_dict(i)
+        cat_index = add['category']
+        add['category'] = rev_cats[cat_index]['name']
+        revenue.append(add)
 
     context = {
-        'line_items': items
+        'expense': json.dumps(expense, cls=DjangoJSONEncoder),
+        'revenue': json.dumps(revenue, cls=DjangoJSONEncoder)
     }
     return render(request, 'pages/display.html', context)
 
