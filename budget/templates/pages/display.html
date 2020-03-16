@@ -1,10 +1,34 @@
 {% include 'partials/header_budget.html' %}
     <h1>Display Data</h1>
 
-    <ul>
-        {% for item in line_items %}
-        <li>{{item}}</li>
-        {% endfor %}
-    </ul>
+    <div id="select-data"></div>
+    <div id="show-data"></div>
+    <script>
+        //declarations and setup SVG
+        var dataset = ["Expense", "Revenue"];
+        var svg_height = 800;
+        var svg_width = 600;
+        var svg = d3.select('#show-data').append('svg')
+            .attr('height', svg_height).attr('width', svg_width);
+
+        // drop-down boxes - not inside SVG.
+        var dd_box = d3.select('#select-data').append('select')
+            .attr('class', 'select')
+            .attr('id', 'dd_box')
+            .on('change', onChange);
+
+        var dd_options = dd_box.selectAll('option')
+            .data(dataset).enter()
+            .append('option')
+                .text(function (d) { return d; });
+
+        function onChange() {
+            selectValue = d3.select('#dd_box').property('value')
+            d3.select('body')
+                .append('p')
+                .text(selectValue + ' is the last selected option.')
+        };
+
+    </script>
 
 {% include 'partials/footer_budget.html' %}
