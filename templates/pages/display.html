@@ -5,8 +5,8 @@
     <div id="show-data"></div>
     <script>
         //declarations and setup SVG
-        var dataset = ["Expense", "Revenue"];
-        var line_items = JSON.parse('{{line_items|safe}}');
+        var choices = ["Expense", "Revenue"];
+        var line_items = JSON.parse('{{expense|safe}}');
         var svg_height = 800;
         var svg_width = 600;
         //var svg = d3.select('#show-data').append('svg')
@@ -19,41 +19,55 @@
             .on('change', onChange);
 
         var dd_options = dd_box.selectAll('option')
-            .data(dataset).enter()
+            .data(choices).enter()
             .append('option')
                 .text(function (d) { return d; });
 
         function onChange() {
             selectValue = d3.select('#dd_box').property('value')
-            d3.select('#select-data')
-                .append('p')
-                .text(selectValue + ' is the last selected option.')
+            if (selectValue == "Expense") {
+                line_items = JSON.parse('{{expense|safe}}');
+                load_table();
+            }
+            else {
+                line_items = JSON.parse('{{revenue|safe}}');
+                load_table();
+            }
         };
 
-        // table set up
-        var table = d3.select('#show-data').append('table')
-            .attr('style', 'margin-left: 250px');
-        var thead = table.append('thead');
-        var tbody = table.append('tbody');
+        // load table data
+        function load_table() {
 
-        // header
-        var header = thead.append('tr');
-        var header_values = ["name", "category", "amount", "date_stamp"];
-        var col_names = header.selectAll('th')
-            .data(header_values).enter().append('th')
-            .text(function(d) { return d; });
+            // remove all previous tables
+            d3.select('#show-data').selectAll('table').remove();
 
-        // table data
-        var rows = tbody.selectAll('tr')
-            .data(line_items).enter().append('tr');
+            // table set up
+            var table = d3.select('#show-data').append('table')
+                .attr('style', 'margin-left: 250px');
+            var thead = table.append('thead');
+            var tbody = table.append('tbody');
 
-        var cells = rows.selectAll('td')
-            .data(function(row) {
-                return header_values.map(function(col) {
-                    return {column: col, value: row[col]};
-                });
-            }).enter().append('td')
-            .text(function(d) { return d.value; });
+            // header
+            var header = thead.append('tr');
+            var header_values = ["name", "category", "amount", "date_stamp"];
+            var col_names = header.selectAll('th')
+                .data(header_values).enter().append('th')
+                .text(function(d) { return d; });
+
+            var rows = tbody.selectAll('tr')
+                .data(line_items).enter().append('tr');
+
+            var cells = rows.selectAll('td')
+                .data(function(row) {
+                    return header_values.map(function(col) {
+                        return {column: col, value: row[col]};
+                    });
+                }).enter().append('td')
+                .text(function(d) { return d.value; });
+        }
+
+        // load table once on page load
+        load_table();
     </script>
 
 {% include 'partials/footer_budget.html' %}
