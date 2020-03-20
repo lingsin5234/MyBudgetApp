@@ -59,89 +59,18 @@ def show_data(request):
 def show_d3(request):
 
     # convert all objects from dict_to_model
-    items = ExpenseLineItem.objects.all()
-    category = ExpCategory.objects.all()
-    revenue = RevenueLineItem.objects.all()
     bank = BankAccount.objects.all()
     cc = CreditCard.objects.all()
     bank_line = BankLineItem.objects.all().order_by('-date_stamp')
     cc_line = CreditCardLineItem.objects.all().order_by('-date_stamp')
     cc_pay = CreditCardPayment.objects.all().order_by('-date_stamp')
-    output = []
-    cats = []
-    revs = []
+
     banks = []
     ccs = []
     bank_lines = []
     cc_lines = []
     cc_pays = []
-    for item in items:
-        add = model_to_dict(item)
-        output.append(add)
-        # output[i] = add
-        # i += 1
-    for cat in category:
-        add = model_to_dict(cat)
-        cats.append(add)
-    # output = json.dumps(items[:])
-    data = [30, 65, 300]
-    json_data = [
-        {
-            "x_axis": 30,
-            "y_axis": 30,
-            "radius": 20,
-            "color": "purple",
-        },
-        {
-            "x_axis": 65,
-            "y_axis": 65,
-            "radius": 20,
-            "color": "orange",
-        },
-        {
-            "x_axis": 200,
-            "y_axis": 200,
-            "radius": 20,
-            "color": "green",
-        }
-    ]
-    expenses = [
-        {
-            "id": 1,
-            "name": "McDonalds",
-            "category": "Food",
-            "amount": 12.40
-        },
-        {
-            "id": 2,
-            "name": "Gateway Entertainment",
-            "category": "Activities",
-            "amount": 11.00
-        }
-    ]
-    bank_info = [
-        {
-            "id": 1,
-            "name": "Cash",
-            "colour": "#660066",
-            "amount": "50.00"
-        },
-        {
-            "id": 2,
-            "name": "RBC",
-            "colour": "#005daa",
-            "amount": "25000.00"
-        },
-        {
-            "id": 3,
-            "name": "Tangerine",
-            "colour": "#f28500",
-            "amount": "1700.00"
-        }
-    ]
-    for rev in revenue:
-        add = model_to_dict(rev)
-        revs.append(add)
+
     for b in bank:
         add = model_to_dict(b)
         banks.append(add)
@@ -159,25 +88,13 @@ def show_d3(request):
         cc_pays.append(add)
 
     context = {
-        'expense': json.dumps(output, cls=DjangoJSONEncoder),
-        'category': json.dumps(cats),
-        'revenue': json.dumps(revs, cls=DjangoJSONEncoder),
-        # 'bank_info': json.dumps(bank_info),
         'bank_info': json.dumps(banks, cls=DjangoJSONEncoder),
         'credit_card': json.dumps(ccs, cls=DjangoJSONEncoder),
         'bank_lines': json.dumps(bank_lines, cls=DjangoJSONEncoder),
         'cc_lines': json.dumps(cc_lines, cls=DjangoJSONEncoder),
-        'cc_pays': json.dumps(cc_pays, cls=DjangoJSONEncoder),
-        'data': data,
-        'json_data': json.dumps(json_data),
-        # 'line_items': output,
-        'type': output[0]
-        # 'expenses': json.dumps(expenses)
+        'cc_pays': json.dumps(cc_pays, cls=DjangoJSONEncoder)
     }
-    # logger.exception("Bad Request 404")
-    # return HttpResponseBadRequest("404")
-    # raise Exception('Make response code 500!')
-    return render(request, 'pages/d3_test.html', context)
+    return render(request, 'pages/dashboard.html', context)
 
 
 # main function to upload latest line items/categories/accounts
