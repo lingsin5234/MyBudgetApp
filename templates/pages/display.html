@@ -1,13 +1,13 @@
 {% include 'partials/header_budget.html' %}
     <div id="my_title" class="d-flex justify-content-center">
-        <h1>Display Data</h1>
+        <h1>Budget Data</h1>
     </div><br>
 
     <div id="select-data"></div>
     <div id="show-data"></div>
     <script>
         (function () {
-                window.expense = JSON.parse('{{expense|safe }}');
+                window.expense = JSON.parse('{{expense|safe}}');
                 window.revenue = JSON.parse('{{revenue|safe}}');
             }());
     </script>
