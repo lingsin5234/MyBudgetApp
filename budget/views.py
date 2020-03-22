@@ -17,6 +17,23 @@ import logging
 # logger = logging.getLogger(__name__)
 
 
+# project page
+def project_markdown(request):
+
+    page_height = 1050
+    f = open('budget/README.md', 'r')
+    if f.mode == 'r':
+        readme = f.read()
+        page_height = len(readme) - 350
+
+    content = {
+        'readme': readme,
+        'page_height': page_height
+    }
+
+    return render(request, 'pages/project.html', content)
+
+
 # line item test view
 def show_data(request):
     exps = ExpenseLineItem.objects.all().order_by('-date_stamp')
