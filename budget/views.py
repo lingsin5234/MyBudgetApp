@@ -12,6 +12,7 @@ import json
 from django.forms.models import model_to_dict
 from .functions import get_exp_data, get_rev_data, update_bank_rev, credit_card_payment, update_bank_exp
 import logging
+from djangoapps.utils import get_this_template
 
 # create logger instance
 # logger = logging.getLogger(__name__)
@@ -31,7 +32,9 @@ def project_markdown(request):
         'page_height': page_height
     }
 
-    return render(request, 'pages/project.html', content)
+    template_page = get_this_template('budget', 'project.html')
+
+    return render(request, template_page, content)
 
 
 # line item test view
