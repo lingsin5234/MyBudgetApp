@@ -3,6 +3,8 @@
         <h1>My (DEMO) Budget Dashboard</h1>
     </div><br>
 
+    <div id="dashboard" class="d-flex justify-content-center"></div><br>
+
     <script>
         (function () {
                 window.bank_info = JSON.parse('{{bank_info|safe}}');
@@ -14,5 +16,9 @@
     </script>
     {% load static %}
     <script src="{% static 'scripts/budget_dashboard.js' %}"></script>
+
+    <div class="d-flex justify-content-center">
+        <p>NOTE: These numbers are made up -- this is a DEMO!</p><br>
+    </div>
 
 {% include 'partials/footer_budget.html' %}
