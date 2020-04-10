@@ -13,6 +13,7 @@ from django.forms.models import model_to_dict
 from .functions import get_exp_data, get_rev_data, update_bank_rev, credit_card_payment, update_bank_exp
 import logging
 from djangoapps.utils import get_this_template
+from .reconcile import reconcile_bank_balances
 
 # create logger instance
 # logger = logging.getLogger(__name__)
@@ -115,6 +116,52 @@ def show_d3(request):
         'cc_pays': json.dumps(cc_pays, cls=DjangoJSONEncoder)
     }
     return render(request, 'pages/dashboard.html', context)
+
+
+# dashboard version 2
+def show_dashboard(request):
+
+    # convert all objects from dict_to_model
+    bank = BankAccount.objects.all()
+    cc = CreditCard.objects.all()
+    bank_line = BankLineItem.objects.all().order_by('-date_stamp')
+    cc_line = CreditCardLineItem.objects.all().order_by('-date_stamp')
+    cc_pay = CreditCardPayment.objects.all().order_by('-date_stamp')
+
+    banks = []
+    ccs = []
+    bank_lines = []
+    cc_lines = []
+    cc_pays = []
+
+    for b in bank:
+        add = model_to_dict(b)
+        banks.append(add)
+    for c in cc:
+        add = model_to_dict(c)
+        ccs.append(add)
+    for bl in bank_line:
+        add = model_to_dict(bl)
+        bank_lines.append(add)
+    for cl in cc_line:
+        add = model_to_dict(cl)
+        cc_lines.append(add)
+    for cp in cc_pay:
+        add = model_to_dict(cp)
+        cc_pays.append(add)
+
+    # recapture the previous values
+    print("Views output: ", reconcile_bank_balances(banks, bank_lines, cc_pays, 10))
+
+    context = {
+        'bank_info': json.dumps(banks, cls=DjangoJSONEncoder),
+        'credit_card': json.dumps(ccs, cls=DjangoJSONEncoder),
+        'bank_lines': json.dumps(bank_lines, cls=DjangoJSONEncoder),
+        'cc_lines': json.dumps(cc_lines, cls=DjangoJSONEncoder),
+        'cc_pays': json.dumps(cc_pays, cls=DjangoJSONEncoder)
+    }
+
+    return render(request, 'pages/budget_dashboard.html', context)
 
 
 # main function to upload latest line items/categories/accounts
