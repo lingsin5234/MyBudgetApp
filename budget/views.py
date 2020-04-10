@@ -151,14 +151,16 @@ def show_dashboard(request):
         cc_pays.append(add)
 
     # recapture the previous values
-    print("Views output: ", reconcile_bank_balances(banks, bank_lines, cc_pays, 10))
+    # print("Views output: ", reconcile_bank_balances(banks, bank_lines, cc_pays, 10))
+    balances = reconcile_bank_balances(banks, bank_lines, cc_pays, 10)
 
     context = {
         'bank_info': json.dumps(banks, cls=DjangoJSONEncoder),
         'credit_card': json.dumps(ccs, cls=DjangoJSONEncoder),
         'bank_lines': json.dumps(bank_lines, cls=DjangoJSONEncoder),
         'cc_lines': json.dumps(cc_lines, cls=DjangoJSONEncoder),
-        'cc_pays': json.dumps(cc_pays, cls=DjangoJSONEncoder)
+        'cc_pays': json.dumps(cc_pays, cls=DjangoJSONEncoder),
+        'balances': json.dumps(balances, cls=DjangoJSONEncoder)
     }
 
     return render(request, 'pages/budget_dashboard.html', context)
