@@ -108,7 +108,7 @@ def reconcile_bank_balances(banks, bank_lines, cc_pays, recent_num):
     for b in banks_balance:
         # b is the key of list_of_banks and bank_balance dicts
         my_balance = list_of_banks[b]['balance']
-        print(my_balance)
+        # print(my_balance)
 
         # temp data frame to sort
         temp_df = df[df.bank_id == b].reset_index(drop=True)
@@ -122,7 +122,7 @@ def reconcile_bank_balances(banks, bank_lines, cc_pays, recent_num):
                 'trans_type': temp_df.loc[i, 'trans_type']
             }
             banks_balance[b].append(temp_dict)
-        print(banks_balance)
-        break
+
+    entire_array = banks_balance
 
     return entire_array
