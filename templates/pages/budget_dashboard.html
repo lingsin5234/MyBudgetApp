@@ -1,0 +1,20 @@
+{% include 'partials/header_budget.html' %}
+    <div id="my_title" class="d-flex justify-content-center">
+        <h1>My (DEMO) Budget Dashboard</h1>
+    </div><br>
+
+    <div id="dashboard" class="d-flex justify-content-center"></div><br>
+
+    <script>
+        (function () {
+                window.bank_info = JSON.parse('{{bank_info|safe}}');
+                window.credit_card = JSON.parse('{{credit_card|safe}}');
+                window.bank_lines = JSON.parse('{{bank_lines|safe}}');
+                window.cc_lines = JSON.parse('{{cc_lines|safe}}');
+                window.cc_pays = JSON.parse('{{cc_pays|safe}}');
+            }());
+    </script>
+    {% load static %}
+    <script src="{% static 'scripts/budget_dashboard_v2.js' %}"></script>
+
+{% include 'partials/footer_budget.html' %}
