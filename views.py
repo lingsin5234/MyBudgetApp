@@ -14,6 +14,7 @@ from .functions import get_exp_data, get_rev_data, update_bank_rev, credit_card_
 import logging
 from djangoapps.utils import get_this_template
 from .reconcile import reconcile_bank_balances
+from .plotly import app
 
 # create logger instance
 # logger = logging.getLogger(__name__)
@@ -333,4 +334,12 @@ def show_category(request, cat_type):
         'cat_type': cat_type
     }
     return render(request, 'pages/show_cats.html', context)
+
+
+# Dashboard Plotly
+def show_plotly_dash(request):
+
+    # app
+
+    return render(request, 'pages/budget_plotly.html')
 
