@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, re_path
+from django.urls import path, re_path, include
 from django.conf import settings
 
 from budget import views as budget_views
@@ -29,4 +29,9 @@ urlpatterns = [
     re_path(r'^show_cat/(?P<cat_type>[\w_]+)/$', budget_views.show_category),
     re_path(r'^project/$', budget_views.project_markdown),
     re_path(r'^$', budget_views.project_markdown),
+
+
+    # plotly dash
+    re_path(r'^dashboard2/$', budget_views.show_plotly_dash),
+    path('django_plotly_dash/', include('django_plotly_dash.urls'))
 ]

@@ -45,8 +45,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # libraries
+    'menu',
+    'django_plotly_dash.apps.DjangoPlotlyDashConfig',
+
+    # app
     'budget',
-    'menu'
 ]
 
 MIDDLEWARE = [
@@ -153,6 +158,9 @@ STATIC_URL = '/static/'
 
 ADMINS = [('Sinto', 'sinto.ling@gmail.com')]
 
+
+# X-Frame for Plotly-Dash
+X_FRAME_OPTIONS = 'SAMEORIGIN'  # prevent the DENY error
 
 # LOGGING ERRORS
 
