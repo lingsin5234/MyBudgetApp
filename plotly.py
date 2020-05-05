@@ -66,12 +66,12 @@ bank_line = BankLineItem.objects.values_list().order_by('-date_stamp')
 cc_line = CreditCardLineItem.objects.values_list().order_by('-date_stamp')
 cc_pay = CreditCardPayment.objects.values_list().order_by('-date_stamp')
 
-# convert columns to lists
+``# convert columns to lists
 bank_col = BankAccount._meta.fields
 cc_col = CreditCard._meta.fields
 bl_col = BankLineItem._meta.fields
 cl_col = CreditCardLineItem._meta.fields
-cp_col = CreditCardPayment._meta.fields
+cp_col = CreditCardPayment._meta.fields``
 
 # get the data frame
 df = pd_reconcile_bank_balances(bank, bank_col, bank_line, bl_col, cc_pay, cp_col)
