@@ -75,7 +75,7 @@ cp_col = CreditCardPayment._meta.fields
 
 # get the data frame
 df = pd_reconcile_bank_balances(bank, bank_col, bank_line, bl_col, cc_pay, cp_col)
-print(df)
+# print(df)
 
 # construct the graph
 fig = go.Figure()
