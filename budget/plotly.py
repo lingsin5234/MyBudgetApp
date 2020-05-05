@@ -52,68 +52,51 @@ if __name__ == '__main__':
     app.run_server(debug=True)
 '''
 
-'''
+# '''
 # Call Budget
-budget_demo = DjangoDash("BudgetDemo", external_stylesheets=external_stylesheets)
+budget_demo = DjangoDash("BudgetDemo")
 # app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 # convert all objects from dict_to_model
-bank = BankAccount.objects.all()
-cc = CreditCard.objects.all()
-bank_line = BankLineItem.objects.all().order_by('-date_stamp')
-cc_line = CreditCardLineItem.objects.all().order_by('-date_stamp')
-cc_pay = CreditCardPayment.objects.all().order_by('-date_stamp')
+bank = BankAccount.objects.values_list()
+cc = CreditCard.objects.values_list()
+bank_line = BankLineItem.objects.values_list().order_by('-date_stamp')
+cc_line = CreditCardLineItem.objects.values_list().order_by('-date_stamp')
+cc_pay = CreditCardPayment.objects.values_list().order_by('-date_stamp')
 
-banks = []
-ccs = []
-bank_lines = []
-cc_lines = []
-cc_pays = []
+# convert columns to lists
+bank_col = BankAccount._meta.fields
+cc_col = CreditCard._meta.fields
+bl_col = BankLineItem._meta.fields
+cl_col = CreditCardLineItem._meta.fields
+cp_col = CreditCardPayment._meta.fields
 
-for b in bank:
-    add = model_to_dict(b)
-    banks.append(add)
-for c in cc:
-    add = model_to_dict(c)
-    ccs.append(add)
-for bl in bank_line:
-    add = model_to_dict(bl)
-    bank_lines.append(add)
-for cl in cc_line:
-    add = model_to_dict(cl)
-    cc_lines.append(add)
-for cp in cc_pay:
-    add = model_to_dict(cp)
-    cc_pays.append(add)
+# get the data frame
+df = pd_reconcile_bank_balances(bank, bank_col, bank_line, bl_col, cc_pay, cp_col)
+print(df)
 
-# recapture the previous values
-# print("Views output: ", reconcile_bank_balances(banks, bank_lines, cc_pays, 10))
-balances = pd_reconcile_bank_balances(banks, bank_lines, cc_pays)
-
-#  df = pd.DataFrame.from_dict(bank_lines)
-print(balances)
-
+# build the graph
 budget_demo.layout = html.Div([
     dcc.Graph(
-        id='life-exp-vs-gdp',
+        id='budget_demo',
         figure={
             'data': [
                 dict(
-                    x=df[df['continent'] == i]['gdp per capita'],
-                    y=df[df['continent'] == i]['life expectancy'],
-                    text=df[df['continent'] == i]['country'],
-                    mode='markers',
+                    x=df[df['account_name'] == i]['date_stamp'],
+                    y=df[df['account_name'] == i]['amount'],
+                    text=df[df['account_name'] == i]['Trans_Type'],
+                    mode='lines+markers',
                     opacity=0.7,
                     marker={
                         'size': 15,
                         'line': {'width': 0.5, 'color': 'white'}
                     },
                     name=i
-                ) for i in df.continent.unique()
+                ) for i in df.account_name.unique()
             ],
             'layout': dict(
-                xaxis={'type': 'log', 'title': 'GDP Per Capita'},
-                yaxis={'title': 'Life Expectancy'},
+                xaxis={'type': 'date', 'title': 'Date'},
+                yaxis={'title': 'Spending / Earnings'},
                 margin={'l': 40, 'b': 40, 't': 10, 'r': 10},
                 legend={'x': 0, 'y': 1},
                 hovermode='closest'
@@ -121,4 +104,4 @@ budget_demo.layout = html.Div([
         }
     )
 ])
-'''
+# '''
