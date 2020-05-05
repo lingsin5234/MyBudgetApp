@@ -1,4 +1,5 @@
 # this file is to reconcile the bank / cc balances with past transactions
+import numpy as np
 import pandas as pd
 
 
@@ -137,8 +138,9 @@ def pd_reconcile_bank_balances(banks, bank_col, bank_lines, bl_col, cc_pays, cp_
 
     # ----- MAP THE BANK ACCOUNTS ----- #
     full_dict = bank.to_dict()
-    bank_dict = dict(zip(list(full_dict['id'].values()), list(full_dict['nickname'].values())))
-    bal_dict = dict(zip(list(full_dict['id'].values()), list(full_dict['balance'].values())))
+    bank_names = list(full_dict['nickname'].values())
+    bank_dict = dict(zip(list(full_dict['id'].values()), bank_names))
+    bal_dict = dict(zip(list(full_dict['nickname'].values()), list(full_dict['balance'].values())))
     # print(bank_dict)
 
     # ----- BANK LINE ITEMS ----- #
@@ -194,13 +196,52 @@ def pd_reconcile_bank_balances(banks, bank_col, bank_lines, bl_col, cc_pays, cp_
 
     # ----- REORDER AND GET BALANCES ----- #
     df.sort_values(by='date_stamp', axis=0, ascending=False, inplace=True)
-    df['balance'] = 0
-    for b in bank.id:
-        if len(df[df['account']==b]) > 0:
-            # df.loc[df['account'] == b, 'balance'][0] = bal_dict[b]
-            print(df.loc[df['account'] == b, 'amount'].rolling(2).sum())
-            # need to rethink this logic...
 
-    # print(df)
+    # create large data transaction table
+    cdf = df[['account_name', 'date_stamp', 'amount']].groupby(['date_stamp', 'account_name'], as_index=False).sum()
+    cdf = cdf.merge(df[['account_name', 'date_stamp', 'Trans_Type']]
+                    .groupby(['date_stamp', 'account_name'], as_index=False)['Trans_Type']
+                    .apply(lambda x: ','.join(x)).reset_index(), on=['account_name', 'date_stamp'])\
+        .rename(columns={0: 'transactions'})
 
-    return df
+    # create candle df and add columns
+    candle_df = []
+    cdf['Open'], cdf['Low'], cdf['High'], cdf['Close'] = [0, 0, 0, 0]
+    rv_bank_names = []
+    for i, x in enumerate(bank_names):
+        if len(cdf.loc[cdf['account_name'] == x]) > 0:
+            temp_df = cdf.loc[cdf['account_name'] == x,
+                              ['date_stamp', 'amount', 'transactions', 'Open', 'Low', 'High', 'Close']]\
+                .set_index('date_stamp').sort_index(ascending=False)
+
+            # work backwards with current balance as 'Close'; minus rolling (expanding)
+            dates = temp_df.index
+            temp_df['minus_expanding'] = -temp_df['amount'].expanding(2).sum()
+            temp_df['Open'] = float(bal_dict[x]) + temp_df['minus_expanding']
+            temp_df['Close'] = temp_df['Open'] + [float(n) for n in temp_df['amount']]
+
+            # fix first items NAN
+            temp_df.loc[dates[0], 'Close'] = float(bal_dict[x])
+            temp_df.loc[dates[0], 'Open'] = temp_df.loc[dates[0], 'Close'] - float(temp_df.loc[dates[0], 'amount'])
+
+            # high and lows
+            temp_df['High'] = temp_df.apply(lambda x: max(x['Open'], x['Close']), axis=1)
+            temp_df['Low'] = temp_df.apply(lambda x: min(x['Open'], x['Close']), axis=1)
+
+            # print(x, bal_dict[x], temp_df)
+            rv_bank_names.append(x)
+            candle_df.append(temp_df)
+
+    # concat
+    cdf = pd.concat(candle_df, axis=1, keys=rv_bank_names)
+
+    # send out as a list
+    list_df = []
+    for x in rv_bank_names:
+        if len(cdf[x]) > 0:
+            # print(x, cdf[x][['transactions', 'Open', 'Low', 'High', 'Close']])
+            list_df.append(cdf[x][['transactions', 'Open', 'Low', 'High', 'Close']])
+
+    output_dict = dict(zip(rv_bank_names, list_df))
+
+    return output_dict

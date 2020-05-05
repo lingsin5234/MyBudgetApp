@@ -66,20 +66,35 @@ bank_line = BankLineItem.objects.values_list().order_by('-date_stamp')
 cc_line = CreditCardLineItem.objects.values_list().order_by('-date_stamp')
 cc_pay = CreditCardPayment.objects.values_list().order_by('-date_stamp')
 
-``# convert columns to lists
+# convert columns to lists
 bank_col = BankAccount._meta.fields
 cc_col = CreditCard._meta.fields
 bl_col = BankLineItem._meta.fields
 cl_col = CreditCardLineItem._meta.fields
-cp_col = CreditCardPayment._meta.fields``
+cp_col = CreditCardPayment._meta.fields
 
 # get the data frame
-df = pd_reconcile_bank_balances(bank, bank_col, bank_line, bl_col, cc_pay, cp_col)
-# print(df)
+o_dict = pd_reconcile_bank_balances(bank, bank_col, bank_line, bl_col, cc_pay, cp_col)
 
 # construct the graph
 fig = go.Figure()
 
+# plot candlestick plot
+for i, b_name in enumerate(o_dict):
+    df = o_dict[b_name]
+    # print(b_name, df)
+    fig.add_trace(go.Candlestick(
+        x=df.index,
+        open=df['Open'],
+        high=df['High'],
+        low=df['Low'],
+        close=df['Close'],
+        name=b_name,
+        text=df['transactions']
+    ))
+
+'''
+# scatter + line graph
 for i in df.account_name.unique():
     fig.add_trace(go.Scatter(
         x=df[df['account_name'] == i]['date_stamp'],
@@ -93,12 +108,12 @@ for i in df.account_name.unique():
         },
         name=i
     ))
-
+'''
 fig.layout = dict(
         xaxis={'type': 'date', 'title': 'Date'},
         yaxis={'title': 'Spending / Earnings'},
         margin={'l': 40, 'b': 40, 't': 10, 'r': 10},
-        legend={'x': 0, 'y': 1},
+        legend={'x': 1, 'y': 1},
         hovermode='closest',
         template='plotly_dark'
     )
@@ -110,4 +125,4 @@ budget_demo.layout = html.Div([
         figure=fig
     )
 ])
-# '''
+
