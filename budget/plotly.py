@@ -1,6 +1,8 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+import plotly.io as pio
+import plotly.graph_objects as go
 import pandas as pd
 from django.forms.models import model_to_dict
 from .models import BankAccount, BankLineItem, CreditCard, CreditCardLineItem, CreditCardPayment
@@ -51,7 +53,7 @@ app.layout = html.Div([
 if __name__ == '__main__':
     app.run_server(debug=True)
 '''
-
+# print(pio.templates)
 # '''
 # Call Budget
 budget_demo = DjangoDash("BudgetDemo")
@@ -75,33 +77,37 @@ cp_col = CreditCardPayment._meta.fields
 df = pd_reconcile_bank_balances(bank, bank_col, bank_line, bl_col, cc_pay, cp_col)
 print(df)
 
-# build the graph
+# construct the graph
+fig = go.Figure()
+
+for i in df.account_name.unique():
+    fig.add_trace(go.Scatter(
+        x=df[df['account_name'] == i]['date_stamp'],
+        y=df[df['account_name'] == i]['amount'],
+        text=df[df['account_name'] == i]['Trans_Type'],
+        mode='lines+markers',
+        opacity=0.7,
+        marker={
+            'size': 15,
+            'line': {'width': 0.5, 'color': 'white'}
+        },
+        name=i
+    ))
+
+fig.layout = dict(
+        xaxis={'type': 'date', 'title': 'Date'},
+        yaxis={'title': 'Spending / Earnings'},
+        margin={'l': 40, 'b': 40, 't': 10, 'r': 10},
+        legend={'x': 0, 'y': 1},
+        hovermode='closest',
+        template='plotly_dark'
+    )
+
+# show the graph
 budget_demo.layout = html.Div([
     dcc.Graph(
         id='budget_demo',
-        figure={
-            'data': [
-                dict(
-                    x=df[df['account_name'] == i]['date_stamp'],
-                    y=df[df['account_name'] == i]['amount'],
-                    text=df[df['account_name'] == i]['Trans_Type'],
-                    mode='lines+markers',
-                    opacity=0.7,
-                    marker={
-                        'size': 15,
-                        'line': {'width': 0.5, 'color': 'white'}
-                    },
-                    name=i
-                ) for i in df.account_name.unique()
-            ],
-            'layout': dict(
-                xaxis={'type': 'date', 'title': 'Date'},
-                yaxis={'title': 'Spending / Earnings'},
-                margin={'l': 40, 'b': 40, 't': 10, 'r': 10},
-                legend={'x': 0, 'y': 1},
-                hovermode='closest'
-            )
-        }
+        figure=fig
     )
 ])
 # '''
