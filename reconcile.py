@@ -186,6 +186,6 @@ def pd_reconcile_bank_balances(banks, bank_col, bank_lines, bl_col, cc_pays, cp_
     # Credit Card Payments
     df = df.append(cp[['from_bank', 'Trans_Type', 'amount', 'date_stamp']].rename(columns={'from_bank': 'account'}))
     df['account_name'] = df['account'].map(bank_dict)
-    print(df)
+    # print(df)
 
-    return bl
+    return df

@@ -14,7 +14,7 @@ from .functions import get_exp_data, get_rev_data, update_bank_rev, credit_card_
 import logging
 from djangoapps.utils import get_this_template
 from .reconcile import reconcile_bank_balances, pd_reconcile_bank_balances
-# from .plotly import budget_demo
+from .plotly import budget_demo
 
 # create logger instance
 # logger = logging.getLogger(__name__)
@@ -339,6 +339,7 @@ def show_category(request, cat_type):
 # Dashboard Plotly
 def show_plotly_dash(request):
 
+    '''
     # convert all objects from dict_to_model
     bank = BankAccount.objects.values_list()
     cc = CreditCard.objects.values_list()
@@ -353,6 +354,7 @@ def show_plotly_dash(request):
     cp_col = CreditCardPayment._meta.fields
 
     pd_reconcile_bank_balances(bank, bank_col, bank_line, bl_col, cc_pay, cp_col)
+    '''
 
     return render(request, 'pages/budget_plotly.html')
 
