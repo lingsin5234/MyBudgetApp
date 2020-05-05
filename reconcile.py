@@ -138,6 +138,7 @@ def pd_reconcile_bank_balances(banks, bank_col, bank_lines, bl_col, cc_pays, cp_
     # ----- MAP THE BANK ACCOUNTS ----- #
     full_dict = bank.to_dict()
     bank_dict = dict(zip(list(full_dict['id'].values()), list(full_dict['nickname'].values())))
+    bal_dict = dict(zip(list(full_dict['id'].values()), list(full_dict['balance'].values())))
     # print(bank_dict)
 
     # ----- BANK LINE ITEMS ----- #
@@ -171,6 +172,7 @@ def pd_reconcile_bank_balances(banks, bank_col, bank_lines, bl_col, cc_pays, cp_
 
     # ----- CREDIT CARD PAYMENTS ----- #
     cp['Trans_Type'] = 'Credit Card Payment'
+    cp['amount'] = -cp['amount']  # make payments negative
 
     # ----- MAP AND ORDER LINE ITEMS ----- #
     # Bank Line Items
@@ -180,12 +182,23 @@ def pd_reconcile_bank_balances(banks, bank_col, bank_lines, bl_col, cc_pays, cp_
     # Add Bank Line Items per Account
     df = bl.loc[bl['from_transaction'] > 0, ['from_transaction', 'Trans_Type', 'amount', 'date_stamp']]\
         .rename(columns={'from_transaction': 'account'})
+    df['amount'] = -df['amount']  # make these negative only
     df = df.append(bl.loc[bl['to_transaction'] > 0, ['to_transaction', 'Trans_Type', 'amount', 'date_stamp']]
                    .rename(columns={'to_transaction': 'account'}))
 
     # Credit Card Payments
     df = df.append(cp[['from_bank', 'Trans_Type', 'amount', 'date_stamp']].rename(columns={'from_bank': 'account'}))
     df['account_name'] = df['account'].map(bank_dict)
+
+    # ----- REORDER AND GET BALANCES ----- #
+    df.sort_values(by='date_stamp', axis=0, ascending=False, inplace=True)
+    df['balance'] = 0
+    for b in bank.id:
+        if len(df[df['account']==b]) > 0:
+            # df.loc[df['account'] == b, 'balance'][0] = bal_dict[b]
+            print(df.loc[df['account'] == b, 'amount'].rolling(2).sum())
+            # need to rethink this logic...
+
     # print(df)
 
     return df
