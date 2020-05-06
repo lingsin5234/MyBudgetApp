@@ -29,7 +29,7 @@ urlpatterns = [
     re_path(r'^show_cat/(?P<cat_type>[\w_]+)/$', budget_views.show_category),
     re_path(r'^project/$', budget_views.project_markdown),
     re_path(r'^$', budget_views.project_markdown),
-
+    re_path(r'^data-gen/$', budget_views.budget_data_generate),
 
     # plotly dash
     re_path(r'^dashboard2/$', budget_views.show_plotly_dash),
