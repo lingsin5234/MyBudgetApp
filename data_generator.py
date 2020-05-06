@@ -34,6 +34,7 @@ REV_CATEGORY = {
 }
 BANK_ACCOUNTS = ['Cash', 'TangoCheq', 'RBCCheq', 'CIBC Cheq', 'TD Savings']
 CREDIT_CARDS = ['RBC Avion', 'TangoCC', 'TD Aeroplan Inf', 'CIBC Aventura']
+TRANSFER_ACCOUNTS = ['TangoCheq', 'CIBC Cheq', 'TD Savings']
 GST = 0.05
 # Expenses; LOW: $5-$15; MED: $15-30; HIGH: $30-80
 # CASH 0.333 / DEBIT 0.333 / CREDIT 0.333
@@ -84,6 +85,15 @@ PAY_TYPE3 = ['debit', 'credit', 'credit', 'credit', 'credit',
              'credit', 'credit', 'credit', 'credit', 'credit']  # SKEWED 1:9 ratio
 PAY_TYPE4 = ['credit']
 PAY_TYPE5 = ['debit']
+
+# IMPORTANT GLOBAL VARIABLES:
+rev_pk = 1
+exp_pk = 1
+bl_pk = 1
+cc_pay_pk = 1
+cc_line_pk = 1
+bank_balances = {1: 200, 2: 15227.84, 3: 12535.13, 4: 11111.34, 5: 4214.15}
+cc_balances = {3: 0, 4: 0, 5: 0, 6: 0}
 
 
 # GENERATOR RANDOM INTEGERS WITHIN A RANGE
@@ -156,13 +166,46 @@ def get_pay_account(pay_type):
 # GENERATE BANK LINE ITEM
 def generate_bank_line_item(from_bank, to_bank, amount, date_stamp):
 
+    global bl_pk, bank_balances
     line_item = dict(
-        from_transaction=from_bank,
-        to_transaction=to_bank,
-        amount=Decimal(amount),
-        date_stamp=format(date_stamp, '%Y-%m-%d')
+        model='budget.banklineitem',
+        pk=bl_pk,
+        fields=dict(
+            from_transaction=from_bank,
+            to_transaction=to_bank,
+            amount=Decimal(amount),
+            date_stamp=format(date_stamp, '%Y-%m-%d')
+        )
     )
 
+    # update bank balance(s)
+    if from_bank is not None:
+        bank_balances[from_bank] -= amount
+    if to_bank is not None:
+        bank_balances[to_bank] += amount
+
+    bl_pk += 1
+    return line_item
+
+
+# GENERATE CREDIT CARD LINE ITEM
+def generate_cc_line_item(credit_card, amount, date_stamp):
+
+    global cc_line_pk, cc_balances
+    line_item = dict(
+        model='budget.creditcardlineitem',
+        pk=cc_line_pk,
+        fields=dict(
+            to_credit_card=credit_card,
+            amount=Decimal(amount),
+            date_stamp=format(date_stamp, '%Y-%m-%d')
+        )
+    )
+
+    # update credit card balances
+    cc_balances[credit_card] += amount
+
+    cc_line_pk += 1
     return line_item
 
 
@@ -177,15 +220,21 @@ def generate_expense(expense_item, price_rate, pay_type_sel, date_stamp):
     pay_type = rdm.choice(pay_type_sel)
     selected = get_pay_account(pay_type)
 
+    global exp_pk
     exp_item = dict(
-        name=item,
-        category=category_id,
-        pay_type=pay_type,
-        card_name=None,
-        bank_account=None,
-        date_stamp=format(date_stamp, '%Y-%m-%d'),
-        amount=Decimal(amount)
+        model='budget.expenselineitem',
+        pk=exp_pk,
+        fields=dict(
+            name=item,
+            category=category_id,
+            pay_type=pay_type,
+            card_name=None,
+            bank_account=None,
+            date_stamp=format(date_stamp, '%Y-%m-%d'),
+            amount=Decimal(amount)
+        )
     )
+    exp_pk += 1
     if pay_type == 'debit':
         # get bank/card id
         selected_id = list(BankAccount.objects.filter(nickname=selected).values('id'))[0]['id']
@@ -195,8 +244,14 @@ def generate_expense(expense_item, price_rate, pay_type_sel, date_stamp):
         bank_item = generate_bank_line_item(selected_id, None, amount, date_stamp)
 
     elif pay_type == 'credit':
-        exp_item['card_name'] = selected
-        bank_item = None
+        if item == 'Rent': # keep bank account fixed for rent
+            selected_id = list(CreditCard.objects.filter(nickname='TangoCC').values('id'))[0]['id']
+        else:
+            selected_id = list(CreditCard.objects.filter(nickname=selected).values('id'))[0]['id']
+        exp_item['card_name'] = selected_id
+
+        # generate CC item -- keep variable name, for the convenience of the list
+        bank_item = generate_cc_line_item(selected_id, amount, date_stamp)
     else:
         # cash needs a bank line item
         bank_item = generate_bank_line_item(1, None, amount, date_stamp)
@@ -215,14 +270,20 @@ def generate_revenue(revenue_item, price_rate, pay_type_sel, date_stamp):
     pay_type = rdm.choice(pay_type_sel)
     selected = get_pay_account(pay_type)
 
+    global rev_pk
     rev_item = dict(
-        name=item,
-        category=category_id,
-        cash_debit=pay_type,
-        bank_account=None,
-        date_stamp=format(date_stamp, '%Y-%m-%d'),
-        amount=Decimal(amount)
+        model='budget.revenuelineitem',
+        pk=rev_pk,
+        fields=dict(
+            name=item,
+            category=category_id,
+            cash_debit=pay_type,
+            bank_account=None,
+            date_stamp=format(date_stamp, '%Y-%m-%d'),
+            amount=Decimal(amount)
+        )
     )
+    rev_pk += 1
     if pay_type == 'debit':
         # get bank/card id
         if item == 'Pay':  # keep bank account fixed for pay
@@ -241,6 +302,23 @@ def generate_revenue(revenue_item, price_rate, pay_type_sel, date_stamp):
     return [rev_item, bank_item]
 
 
+# GENERATE RANDOM TRANSFERS BETWEEN ACCOUNTS
+def generate_bank_transfers(date_stamp):
+
+    global bank_balances
+    rbc_id = list(BankAccount.objects.filter(nickname='RBCCheq').values('id'))[0]['id']
+    to_bank = rdm.choice(TRANSFER_ACCOUNTS)
+    to_bank_id = list(BankAccount.objects.filter(nickname=to_bank).values('id'))[0]['id']
+    amount = rdm.randint(300, 900)
+    bank_item = generate_bank_line_item(rbc_id, to_bank_id, amount, date_stamp)
+
+    # update bank balances
+    bank_balances[rbc_id] -= amount
+    bank_balances[to_bank_id] += amount
+
+    return [bank_item]
+
+
 # GENERATE RANDOM BUDGET DATA!
 def generate_budget_data(start_date, end_date):
 
@@ -251,6 +329,13 @@ def generate_budget_data(start_date, end_date):
     weekly_counter = rdm.randint(0, 6)
     weekly_flag = True
     biweekly_flag = True
+    monthly_fixed = [rdm.randint(1, 28), rdm.randint(1, 28), rdm.randint(1, 28)]
+    monthly_counter = rdm.randint(1, 28)
+    monthly_flag = True
+    seasonal_flag = 0
+    half_year_flag = 0
+    one_year_flag = 0
+    two_year_flag = 0
 
     while on_date <= end_date:
 
@@ -258,7 +343,7 @@ def generate_budget_data(start_date, end_date):
         day = on_date.day
         day_of_week = on_date.weekday()
 
-        # PROCESS DAILY
+        # ---- DAILY ---- #
         num_of_exp = generate_occurence('MED')
         for i in range(num_of_exp):
             # print(generate_expense(DAILY_LOW, 'LOW', PAY_TYPE1, on_date))
@@ -272,8 +357,9 @@ def generate_budget_data(start_date, end_date):
         for i in range(num_of_rev):
             # print(generate_revenue(DAILY_LOW_R, 'LOW', PAY_TYPE2, on_date))
             output_data.extend(generate_revenue(DAILY_LOW_R, 'LOW', PAY_TYPE2, on_date))
+        # ----------------- #
 
-        # PROCESS WEEKLY
+        # ---- WEEKLY ---- #
         if day_of_week == weekly_counter & weekly_flag:
             num_of_exp = generate_occurence('LOW')
             for i in range(num_of_exp):
@@ -284,6 +370,8 @@ def generate_budget_data(start_date, end_date):
             weekly_flag = False  # set weekly flag to not create new weekly_counter until Sunday
 
         # WEEKLY_CASH_FLOW = ['Deposit', 'Withdrawal', 'Transfer']
+        if rdm.randint(0, 1) == 1:
+            output_data.extend(generate_bank_transfers(on_date))
 
         # Reset Weekly Counter
         if day_of_week == 6 & (not weekly_flag):
@@ -296,12 +384,92 @@ def generate_budget_data(start_date, end_date):
             biweekly_flag = False
         elif day_of_week == 3 & (not biweekly_flag):  # set flag for next week
             biweekly_flag = True
+        # ----------------- #
 
-        # MONTHLY
+        # ---- MONTHLY ---- #
+        if day == 1:
+            output_data.extend(generate_expense(MONTHLY_RENT, 2000, PAY_TYPE4, on_date))
+        if day == monthly_fixed[0]:
+            output_data.extend(generate_expense([MONTHLY_65[0]], 50, PAY_TYPE4, on_date))
+            output_data.extend(generate_expense([MONTHLY_65[1]], 80, PAY_TYPE4, on_date))
+        if day == monthly_fixed[1]:
+            output_data.extend(generate_expense([MONTHLY_65[2]], 65, PAY_TYPE4, on_date))
+        if day == monthly_fixed[2]:
+            output_data.extend(generate_expense([MONTHLY_250[0]], 250, PAY_TYPE4, on_date))
+            output_data.extend(generate_expense([MONTHLY_250[1]], 20, PAY_TYPE4, on_date))
+
+        # if monthly_flag
+        if day == monthly_counter & monthly_flag:
+            output_data.extend(generate_expense(MONTHLY_HIGH, 'HIGH', PAY_TYPE4, on_date))
+            monthly_flag = False
+
+        # Reset Monthly Counter
+        if day == 28 & (not monthly_flag):
+            monthly_flag = True
+            monthly_counter = rdm.randint(1, 28)
+
+        # revenue
+        if rdm.randint(0, 1) == 1:
+            output_data.extend(generate_revenue(MONTHLY_300, 300, PAY_TYPE5, on_date))
+        output_data.extend(generate_revenue(MONTHLY_MED, 100, PAY_TYPE5, on_date))
+
+        # PAY OFF CREDIT CARD(s)
+
+        # ----------------- #
+
+        # ---- SEASONAL ---- #
+        if seasonal_flag == 2:
+            output_data.extend(generate_expense([SEASONAL_50[0]], 50, PAY_TYPE4, on_date))
+            output_data.extend(generate_expense([SEASONAL_50[1]], 20, PAY_TYPE4, on_date))
+            if rdm.randint(0, 1) == 1:
+                output_data.extend(generate_expense([SEASONAL_50[2]], 60, PAY_TYPE4, on_date))
+            if rdm.randint(0, 1) == 1:
+                output_data.extend(generate_expense([SEASONAL_50[3]], 40, PAY_TYPE4, on_date))
+            if rdm.randint(0, 1) == 1:
+                output_data.extend(generate_expense(SEASONAL_500, 500, PAY_TYPE4, on_date))
+
+            num_of_exp = generate_occurence('LOW')
+            for i in range(num_of_exp):
+                output_data.extend(generate_expense(SEASONAL_MED, 'MED', PAY_TYPE4, on_date))
+            seasonal_flag == 0
+        if day == 28 & seasonal_flag != 2:
+            seasonal_flag += 1
+        # ----------------- #
+
+        # ---- HALF-YEAR ---- #
+        if half_year_flag == 5:
+            output_data.extend(generate_expense(HALF_YEAR_100, 100, PAY_TYPE4, on_date))
+            output_data.extend(generate_revenue(HALF_YEAR_80, 80, PAY_TYPE5, on_date))
+            half_year_flag = 0
+        if day == 24 & half_year_flag != 5:
+            half_year_flag += 1
+        # ------------------- #
+
+        # ---- ONE YEAR ---- #
+        # random refunds
+        if one_year_flag == 11:
+            output_data.extend(generate_revenue(ONE_YEAR_HIGH, 'HIGH', PAY_TYPE5, on_date))
+            one_year_flag = 0
+        if day == 20 & one_year_flag != 11:
+            one_year_flag += 1
+        # ------------------ #
+
+        # ---- TW0-YEAR ---- #
+        if two_year_flag == 23:
+            output_data.extend(generate_expense(TWO_YEAR_100, 100, PAY_TYPE4, on_date))
+            output_data.extend(generate_revenue(TWO_YEAR_80, 80, PAY_TYPE5, on_date))
+            output_data.extend(generate_expense(TWO_YEAR_600, 600, PAY_TYPE4, on_date))
+            output_data.extend(generate_revenue(TWO_YEAR_480, 480, PAY_TYPE5, on_date))
+            two_year_flag = 0
+        if day == 15 & two_year_flag != 23:
+            two_year_flag += 1
+        # ------------------ #
 
         # increment date
         on_date += dt.timedelta(days=1)
     print(output_data)
+    print(bank_balances)
+    print(cc_balances)
     return True
 
 
