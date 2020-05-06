@@ -1,6 +1,8 @@
 # generate fake budget data
 import random as rdm
 import datetime as dt
+from decimal import Decimal
+from .models import ExpCategory, RevCategory
 
 # CONSTANTS
 EXP_CATEGORY = {
@@ -111,21 +113,21 @@ def generate_occurence(level):
 
 # Working with dates
 start_date = dt.datetime(2020, 1, 1)
-end_date = dt.datetime(2020, 1, 31)
+# end_date = dt.datetime(2020, 1, 31)
 # print(start_date.weekday())  # 0 is Monday
 # print(start_date + dt.timedelta(days=1))
 
 
 # GET EXP/REV CATEGORY
-def get_category(CAT_TYPE, ITEM):
+def get_category(cat_type, given_item):
 
-    if CAT_TYPE == 'REV':
+    if cat_type == 'REV':
         dictionary = REV_CATEGORY
     else:
         dictionary = EXP_CATEGORY
 
     for key, item in dictionary.items():
-        if item == ITEM:
+        if given_item in [n for n in item]:
             return key
 
     # otherwise...
@@ -149,14 +151,35 @@ def get_pay_type(pay_type):
 
 
 # GENERATE EXPENSE LINE ITEM
-def generate_expense(EXPENSE, RATE, PAY_TYPE):
+def generate_expense(expense_item, price_rate, pay_type_sel, date_stamp):
 
-    exp_item = []
-
-    item = rdm.choice(EXPENSE)
-    price = generate_integer(RATE) * GST
+    item = rdm.choice(expense_item)
+    amount = round(generate_integer(price_rate) * (1 + GST), 2)
     category = get_category('EXP', item)
-    pay_type = rdm.choice(PAY_TYPE)
+    category_id = list(ExpCategory.objects.filter(name=category).values('id'))[0]['id']
+    # category_id = 0  # for testing purposes
+    pay_type = rdm.choice(pay_type_sel)
+    selected = get_pay_type(pay_type)
+
+    exp_item = dict(
+        name=item,
+        category=category_id,
+        pay_type=pay_type,
+        card_name=None,
+        bank_account=None,
+        date_stamp=format(date_stamp, '%Y-%m-%d'),
+        amount=Decimal(amount)
+    )
+    if pay_type == 'debit':
+        exp_item['bank_account'] = selected
+
+        # also need a bank line item
+
+    elif pay_type == 'credit':
+        exp_item['card_name'] = selected
+    else:
+        # cash needs a bank line item
+
 
     return exp_item
 
@@ -171,7 +194,11 @@ def generate_budget_data(start_date, end_date):
         day = on_date.day
 
         # PROCESS DAILY
-        rdm.choice(DAILY_LOW)
+        num_of_exp = generate_occurence('MED')
+        num_of_rev = generate_occurence('LOW')
+
+        for i in range(num_of_exp):
+            print(generate_expense(DAILY_LOW, 'LOW', PAY_TYPE1, on_date))
 
         # increment date
         on_date += dt.timedelta(days=1)
@@ -180,3 +207,4 @@ def generate_budget_data(start_date, end_date):
 
 
 # generate_budget_data(start_date, end_date)
+# print(format(start_date, '%Y-%m-%d'))

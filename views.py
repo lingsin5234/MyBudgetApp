@@ -15,6 +15,8 @@ import logging
 from djangoapps.utils import get_this_template
 from .reconcile import reconcile_bank_balances, pd_reconcile_bank_balances
 from .plotly import budget_demo
+import datetime as dt
+from .data_generator import generate_budget_data
 
 # create logger instance
 # logger = logging.getLogger(__name__)
@@ -358,3 +360,13 @@ def show_plotly_dash(request):
 
     return render(request, 'pages/budget_plotly.html')
 
+
+# Generate BUDGET Data
+def budget_data_generate(request):
+
+    # generate data
+    s_date = dt.datetime(2020, 1, 1)
+    e_date = dt.datetime(2020, 1, 2)
+    generate_budget_data(s_date, e_date)
+
+    return render(request, 'pages/budget_data-gen.html')
