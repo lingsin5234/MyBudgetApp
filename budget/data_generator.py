@@ -64,7 +64,8 @@ TWO_YEAR_600 = ['Glasses']
 # CASH 0.5 / DEBIT 0.5
 DAILY_LOW_R = ['Misc.', 'Softball', 'Meal']
 
-WEEKLY_CASH_FLOW = ['Deposit', 'Withdrawal', 'Transfer']
+# with more Withdrawals
+WEEKLY_CASH_FLOW = ['Deposit', 'Withdrawal', 'Withdrawal', 'Withdrawal', 'Transfer', 'Transfer']
 
 # DEBIT
 BIWEEKLY_2000 = ['Pay']
@@ -92,7 +93,7 @@ exp_pk = 1
 bl_pk = 1
 cc_pay_pk = 1
 cc_line_pk = 1
-bank_balances = {1: 200, 2: 15227.84, 3: 12535.13, 4: 11111.34, 5: 4214.15}
+bank_balances = {1: 500, 2: 5227.84, 5: 24214.15, 4: 11111.34, 3: 25535.13}  # put RBC at the back...
 cc_balances = {3: 0, 4: 0, 5: 0, 6: 0}
 
 
@@ -110,7 +111,7 @@ def generate_integer(level):
 
 
 # GENERATOR FOR OCCURRENCES ON GIVEN FREQUENCY
-def generate_occurence(level):
+def generate_occurrence(level):
 
     if level == 'LOW':
         return rdm.randint(0, 2)
@@ -143,7 +144,6 @@ def get_category(cat_type, given_item):
         if given_item in [n for n in item]:
             return key
 
-    # otherwise...
     return False
 
 
@@ -228,8 +228,6 @@ def generate_expense(expense_item, price_rate, pay_type_sel, date_stamp):
             name=item,
             category=category_id,
             pay_type=pay_type,
-            card_name=None,
-            bank_account=None,
             date_stamp=format(date_stamp, '%Y-%m-%d'),
             amount=Decimal(amount)
         )
@@ -238,21 +236,25 @@ def generate_expense(expense_item, price_rate, pay_type_sel, date_stamp):
     if pay_type == 'debit':
         # get bank/card id
         selected_id = list(BankAccount.objects.filter(nickname=selected).values('id'))[0]['id']
-        exp_item['bank_account'] = selected_id
+        exp_item['fields']['bank_account'] = selected_id
+        exp_item['fields']['card_name'] = None
 
         # generate bank line item
         bank_item = generate_bank_line_item(selected_id, None, amount, date_stamp)
 
     elif pay_type == 'credit':
-        if item == 'Rent': # keep bank account fixed for rent
+        if item == 'Rent':  # keep bank account fixed for rent
             selected_id = list(CreditCard.objects.filter(nickname='TangoCC').values('id'))[0]['id']
         else:
             selected_id = list(CreditCard.objects.filter(nickname=selected).values('id'))[0]['id']
-        exp_item['card_name'] = selected_id
+        exp_item['fields']['bank_account'] = None
+        exp_item['fields']['card_name'] = selected_id
 
         # generate CC item -- keep variable name, for the convenience of the list
         bank_item = generate_cc_line_item(selected_id, amount, date_stamp)
     else:
+        exp_item['fields']['bank_account'] = None
+        exp_item['fields']['card_name'] = None
         # cash needs a bank line item
         bank_item = generate_bank_line_item(1, None, amount, date_stamp)
 
@@ -278,7 +280,6 @@ def generate_revenue(revenue_item, price_rate, pay_type_sel, date_stamp):
             name=item,
             category=category_id,
             cash_debit=pay_type,
-            bank_account=None,
             date_stamp=format(date_stamp, '%Y-%m-%d'),
             amount=Decimal(amount)
         )
@@ -290,12 +291,13 @@ def generate_revenue(revenue_item, price_rate, pay_type_sel, date_stamp):
             selected_id = list(BankAccount.objects.filter(nickname='RBCCheq').values('id'))[0]['id']
         else:
             selected_id = list(BankAccount.objects.filter(nickname=selected).values('id'))[0]['id']
-        rev_item['bank_account'] = selected_id
+        rev_item['fields']['bank_account'] = selected_id
 
         # generate bank line item
         bank_item = generate_bank_line_item(None, selected_id, amount, date_stamp)
 
     else:
+        rev_item['fields']['bank_account'] = None
         # cash needs a bank line item
         bank_item = generate_bank_line_item(None, 1, amount, date_stamp)
 
@@ -303,18 +305,114 @@ def generate_revenue(revenue_item, price_rate, pay_type_sel, date_stamp):
 
 
 # GENERATE RANDOM TRANSFERS BETWEEN ACCOUNTS
-def generate_bank_transfers(date_stamp):
+def generate_bank_transfers(flow, date_stamp):
 
     global bank_balances
     rbc_id = list(BankAccount.objects.filter(nickname='RBCCheq').values('id'))[0]['id']
-    to_bank = rdm.choice(TRANSFER_ACCOUNTS)
-    to_bank_id = list(BankAccount.objects.filter(nickname=to_bank).values('id'))[0]['id']
-    amount = rdm.randint(300, 900)
-    bank_item = generate_bank_line_item(rbc_id, to_bank_id, amount, date_stamp)
+    bank = rdm.choice(TRANSFER_ACCOUNTS)
+    bank_id = list(BankAccount.objects.filter(nickname=bank).values('id'))[0]['id']
+
+    if flow == 'FROM RBC':
+        amount = rdm.randint(300, 800)
+        bank_item = generate_bank_line_item(rbc_id, bank_id, amount, date_stamp)
+
+        # update bank balances
+        bank_balances[rbc_id] -= amount
+        bank_balances[bank_id] += amount
+    else:
+        amount = rdm.randint(6000, 10000)
+        # check if bank has that much
+        escape_counter = 0
+        while (bank_balances[bank_id] < amount) and (escape_counter < 10):
+            bank = rdm.choice(TRANSFER_ACCOUNTS)
+            bank_id = list(BankAccount.objects.filter(nickname=bank).values('id'))[0]['id']
+            escape_counter += 1
+        if bank_balances[bank_id] < amount:
+            amount = 0  # transfer nothing
+        bank_item = generate_bank_line_item(bank_id, rbc_id, amount, date_stamp)
+        # print('REFRESH RBC:', bank_item)
+
+        # update bank balances
+        bank_balances[bank_id] -= amount
+        bank_balances[rbc_id] += amount
+
+    # DEBUG
+    # print(bank_item, bank_id, rbc_id, date_stamp)
+
+    return [bank_item]
+
+
+# GENERATE CREDIT CARD PAYMENTS
+def generate_cc_payments(date_stamp):
+
+    global bank_balances, cc_balances, cc_pay_pk
+
+    # loop thru and pay off each credit card balance
+    payment_list = []
+    for cc, cb in cc_balances.items():
+        if cb > 0:
+            for bnk, bal in bank_balances.items():
+
+                if (bnk != 1) & (bal > cb):  # ignore Cash; pay it off
+
+                    # generate cc payment
+                    cc_pay_item = dict(
+                        model='budget.creditcardpayment',
+                        pk=cc_pay_pk,
+                        fields=dict(
+                            from_bank=bnk,
+                            to_credit_card=cc,
+                            amount=cb,
+                            date_stamp=format(date_stamp, '%Y-%m-%d')
+                        )
+                    )
+
+                    # generate bank item as well and add to payment list along with cc_pay_item
+                    bank_item = generate_bank_line_item(bnk, None, cb, date_stamp)
+
+                    # use append here cuz we're adding ITEM to the list
+                    payment_list.append(cc_pay_item)
+                    payment_list.append(bank_item)
+                    # extend is extending the list with a list
+
+                    # update the bank balance and cc balance
+                    bank_balances[bnk] = bal - cb
+                    cc_balances[cc] = 0
+                    break
+
+    return payment_list
+
+
+# GENERATE CASH-BANK TRANSFERS (Withdrawal / Deposit)
+def generate_withdraw_deposit(flow, date_stamp):
+
+    global bl_pk, bank_balances
+    rbc_id = list(BankAccount.objects.filter(nickname='CIBC Cheq').values('id'))[0]['id']
+    cash_id = 1
+
+    if flow == 'Withdrawal':
+        from_bank = rbc_id
+        to_bank = cash_id
+    else:
+        from_bank = cash_id
+        to_bank = rbc_id
+
+    amount = rdm.randint(50, 200)
+
+    bank_item = dict(
+        model='budget.banklineitem',
+        pk=bl_pk,
+        fields=dict(
+            from_transaction=from_bank,
+            to_transaction=to_bank,
+            amount=Decimal(amount),
+            date_stamp=format(date_stamp, '%Y-%m-%d')
+        )
+    )
 
     # update bank balances
-    bank_balances[rbc_id] -= amount
-    bank_balances[to_bank_id] += amount
+    bank_balances[from_bank] -= amount
+    bank_balances[to_bank] += amount
 
     return [bank_item]
 
@@ -332,57 +430,68 @@ def generate_budget_data(start_date, end_date):
     monthly_fixed = [rdm.randint(1, 28), rdm.randint(1, 28), rdm.randint(1, 28)]
     monthly_counter = rdm.randint(1, 28)
     monthly_flag = True
-    seasonal_flag = 0
-    half_year_flag = 0
-    one_year_flag = 0
-    two_year_flag = 0
-
+    seasonal_flag = 1
+    half_year_flag = 3
+    one_year_flag = 5
+    two_year_flag = 6
+    # print(monthly_counter, monthly_flag)
     while on_date <= end_date:
 
         # Date Breakdown
         day = on_date.day
         day_of_week = on_date.weekday()
+        month = on_date.month
 
         # ---- DAILY ---- #
-        num_of_exp = generate_occurence('MED')
+        num_of_exp = generate_occurrence('MED')
         for i in range(num_of_exp):
             # print(generate_expense(DAILY_LOW, 'LOW', PAY_TYPE1, on_date))
             output_data.extend(generate_expense(DAILY_LOW, 'LOW', PAY_TYPE1, on_date))
 
-        num_of_exp = generate_occurence('LOW')
+        num_of_exp = generate_occurrence('LOW')
         for i in range(num_of_exp):
             output_data.extend(generate_expense(DAILY_MED, 'MED', PAY_TYPE3, on_date))
 
-        num_of_rev = generate_occurence('LOW')
+        num_of_rev = generate_occurrence('LOW')
         for i in range(num_of_rev):
             # print(generate_revenue(DAILY_LOW_R, 'LOW', PAY_TYPE2, on_date))
             output_data.extend(generate_revenue(DAILY_LOW_R, 'LOW', PAY_TYPE2, on_date))
         # ----------------- #
 
         # ---- WEEKLY ---- #
-        if day_of_week == weekly_counter & weekly_flag:
-            num_of_exp = generate_occurence('LOW')
+        if (day_of_week == weekly_counter) & weekly_flag:
+            num_of_exp = generate_occurrence('LOW')
             for i in range(num_of_exp):
                 output_data.extend(generate_expense(WEEKLY_LOW, 'LOW', PAY_TYPE3, on_date))
-            num_of_exp = generate_occurence('LOW')
+
+            num_of_exp = generate_occurrence('LOW')
             for i in range(num_of_exp):
                 output_data.extend(generate_expense(WEEKLY_HIGH, 'HIGH', PAY_TYPE3, on_date))
+
             weekly_flag = False  # set weekly flag to not create new weekly_counter until Sunday
 
         # WEEKLY_CASH_FLOW = ['Deposit', 'Withdrawal', 'Transfer']
         if rdm.randint(0, 1) == 1:
-            output_data.extend(generate_bank_transfers(on_date))
+            flow = rdm.choice(WEEKLY_CASH_FLOW)
+            if flow == 'Transfer':
+                output_data.extend(generate_bank_transfers('FROM RBC', on_date))
+
+            else:
+                output_data.extend(generate_withdraw_deposit(flow, on_date))
 
         # Reset Weekly Counter
-        if day_of_week == 6 & (not weekly_flag):
+        if (day_of_week == 6) & (not weekly_flag):
             weekly_flag = True
             weekly_counter = rdm.randint(0, 6)
+            # print('WEEKLY: ', day)
+            # print(bank_balances)
+            # print(cc_balances)
 
         # BI-WEEKLY; set to Thursday
-        if day_of_week == 3 & biweekly_flag:
+        if (day_of_week == 3) & biweekly_flag:
             output_data.extend(generate_revenue(BIWEEKLY_2000, 2000, PAY_TYPE5, on_date))
             biweekly_flag = False
-        elif day_of_week == 3 & (not biweekly_flag):  # set flag for next week
+        elif (day_of_week == 3) & (not biweekly_flag):  # set flag for next week
             biweekly_flag = True
         # ----------------- #
 
@@ -398,27 +507,34 @@ def generate_budget_data(start_date, end_date):
             output_data.extend(generate_expense([MONTHLY_250[0]], 250, PAY_TYPE4, on_date))
             output_data.extend(generate_expense([MONTHLY_250[1]], 20, PAY_TYPE4, on_date))
 
-        # if monthly_flag
-        if day == monthly_counter & monthly_flag:
+        # PAY OFF CREDIT CARD(s)
+        if (day == 22) & monthly_flag:
+            output_data.extend(generate_cc_payments(on_date))
+            # print(type(output_data[len(output_data) - 1]))
+
+        # if monthly_flag (some value between 1 - 28)
+        if (day == monthly_counter) & monthly_flag:
             output_data.extend(generate_expense(MONTHLY_HIGH, 'HIGH', PAY_TYPE4, on_date))
+
+            # revenue
+            if rdm.randint(0, 1) == 1:
+                output_data.extend(generate_revenue(MONTHLY_300, 300, PAY_TYPE5, on_date))
+            output_data.extend(generate_revenue(MONTHLY_MED, 100, PAY_TYPE5, on_date))
+
+        if day == 28:  # if last day, then reset flag.
             monthly_flag = False
 
         # Reset Monthly Counter
-        if day == 28 & (not monthly_flag):
+        if (day == 28) & (not monthly_flag):
             monthly_flag = True
             monthly_counter = rdm.randint(1, 28)
-
-        # revenue
-        if rdm.randint(0, 1) == 1:
-            output_data.extend(generate_revenue(MONTHLY_300, 300, PAY_TYPE5, on_date))
-        output_data.extend(generate_revenue(MONTHLY_MED, 100, PAY_TYPE5, on_date))
-
-        # PAY OFF CREDIT CARD(s)
-
+            print("MONTHLY:", month)
+            print(bank_balances)
+            print(cc_balances)
         # ----------------- #
 
         # ---- SEASONAL ---- #
-        if seasonal_flag == 2:
+        if seasonal_flag == 3:
             output_data.extend(generate_expense([SEASONAL_50[0]], 50, PAY_TYPE4, on_date))
             output_data.extend(generate_expense([SEASONAL_50[1]], 20, PAY_TYPE4, on_date))
             if rdm.randint(0, 1) == 1:
@@ -428,49 +544,54 @@ def generate_budget_data(start_date, end_date):
             if rdm.randint(0, 1) == 1:
                 output_data.extend(generate_expense(SEASONAL_500, 500, PAY_TYPE4, on_date))
 
-            num_of_exp = generate_occurence('LOW')
+            num_of_exp = generate_occurrence('LOW')
             for i in range(num_of_exp):
                 output_data.extend(generate_expense(SEASONAL_MED, 'MED', PAY_TYPE4, on_date))
-            seasonal_flag == 0
-        if day == 28 & seasonal_flag != 2:
+            seasonal_flag = 0
+
+        if (day == 28) & (seasonal_flag != 3):
             seasonal_flag += 1
         # ----------------- #
 
         # ---- HALF-YEAR ---- #
-        if half_year_flag == 5:
+        if half_year_flag == 6:
             output_data.extend(generate_expense(HALF_YEAR_100, 100, PAY_TYPE4, on_date))
             output_data.extend(generate_revenue(HALF_YEAR_80, 80, PAY_TYPE5, on_date))
             half_year_flag = 0
-        if day == 24 & half_year_flag != 5:
+        if (day == 24) & (half_year_flag != 6):
             half_year_flag += 1
         # ------------------- #
 
         # ---- ONE YEAR ---- #
         # random refunds
-        if one_year_flag == 11:
+        if one_year_flag == 12:
             output_data.extend(generate_revenue(ONE_YEAR_HIGH, 'HIGH', PAY_TYPE5, on_date))
+
+            # once a year RBC balance refresh
+            output_data.extend(generate_bank_transfers('TO RBC', on_date))
             one_year_flag = 0
-        if day == 20 & one_year_flag != 11:
+        if (day == 20) & (one_year_flag != 12):
             one_year_flag += 1
         # ------------------ #
 
         # ---- TW0-YEAR ---- #
-        if two_year_flag == 23:
+        if two_year_flag == 24:
             output_data.extend(generate_expense(TWO_YEAR_100, 100, PAY_TYPE4, on_date))
             output_data.extend(generate_revenue(TWO_YEAR_80, 80, PAY_TYPE5, on_date))
             output_data.extend(generate_expense(TWO_YEAR_600, 600, PAY_TYPE4, on_date))
             output_data.extend(generate_revenue(TWO_YEAR_480, 480, PAY_TYPE5, on_date))
             two_year_flag = 0
-        if day == 15 & two_year_flag != 23:
+        if (day == 15) & (two_year_flag != 24):
             two_year_flag += 1
         # ------------------ #
 
         # increment date
         on_date += dt.timedelta(days=1)
-    print(output_data)
+    # print(output_data)
+    print("FINAL")
     print(bank_balances)
     print(cc_balances)
-    return True
+    return output_data
 
 
 # generate_budget_data(start_date, end_date)

@@ -365,8 +365,12 @@ def show_plotly_dash(request):
 def budget_data_generate(request):
 
     # generate data
-    s_date = dt.datetime(2020, 1, 1)
-    e_date = dt.datetime(2020, 1, 21)
-    generate_budget_data(s_date, e_date)
-
+    s_date = dt.datetime(2019, 1, 4)
+    e_date = dt.datetime(2020, 5, 1)
+    # generate_budget_data(s_date, e_date)
+    # print(json.dumps(generate_budget_data(s_date, e_date), cls=DjangoJSONEncoder, indent=4))
+    # '''
+    with open('budget_READY20200506.json', 'w') as outfile:
+        json.dump(generate_budget_data(s_date, e_date), outfile, cls=DjangoJSONEncoder, indent=4)
+    # '''
     return render(request, 'pages/budget_data-gen.html')
