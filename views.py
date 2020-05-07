@@ -14,7 +14,7 @@ from .functions import get_exp_data, get_rev_data, update_bank_rev, credit_card_
 import logging
 from djangoapps.utils import get_this_template
 from .reconcile import reconcile_bank_balances, pd_reconcile_bank_balances
-from .plotly import budget_demo
+# from .plotly import budget_demo
 import datetime as dt
 from .data_generator import generate_budget_data
 
