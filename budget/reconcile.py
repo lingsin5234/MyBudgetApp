@@ -75,6 +75,8 @@ def reconcile_bank_balances(banks, bank_lines, cc_pays, recent_num):
             }
             bank_transactions.append(temp_dict)
 
+        # MISSING DEBIT PAY AND CASH PAY lol
+
         # transfer between bank accounts
         else:
             temp_dict = {
