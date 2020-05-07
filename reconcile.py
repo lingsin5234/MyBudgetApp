@@ -75,6 +75,8 @@ def reconcile_bank_balances(banks, bank_lines, cc_pays, recent_num):
             }
             bank_transactions.append(temp_dict)
 
+        # MISSING DEBIT PAY AND CASH PAY lol
+
         # transfer between bank accounts
         else:
             temp_dict = {
@@ -179,6 +181,7 @@ def pd_reconcile_bank_balances(banks, bank_col, bank_lines, bl_col, cc_pays, cp_
     # ----- MAP AND ORDER LINE ITEMS ----- #
     # Bank Line Items
     bl.loc[bl['from_transaction'].isna(), 'from_transaction'] = -1
+    bl.loc[bl['to_transaction'].isna(), 'to_transaction'] = -1
     bl = bl.astype({'from_transaction': 'int64', 'to_transaction': 'int64'})  # convert to int64
 
     # Add Bank Line Items per Account

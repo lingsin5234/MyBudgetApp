@@ -4,6 +4,9 @@ import datetime as dt
 from decimal import Decimal
 from .models import ExpCategory, RevCategory, BankAccount, CreditCard
 
+# SET SEED
+rdm.seed(50)
+
 # CONSTANTS
 EXP_CATEGORY = {
     'Food': ["McDonald's", 'Tim Hortons', 'Pizza Pizza', 'The Keg', 'HK Cafe', 'Pho', 'Sushi Bar'],
@@ -378,6 +381,7 @@ def generate_cc_payments(date_stamp):
                     # update the bank balance and cc balance
                     bank_balances[bnk] = bal - cb
                     cc_balances[cc] = 0
+                    cc_pay_pk += 1
                     break
 
     return payment_list
