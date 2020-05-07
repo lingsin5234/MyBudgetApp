@@ -1,6 +1,7 @@
 # this file is to reconcile the bank / cc balances with past transactions
 import numpy as np
 import pandas as pd
+import datetime as dt
 
 
 # get balances for banks, bank_line_items and credit_card_payments - dictionary version
@@ -12,9 +13,9 @@ def reconcile_bank_balances(banks, bank_lines, cc_pays, recent_num):
 
     # rename the banks into dictionary by its ID number
     for b in banks:
-        id = b['id']
-        list_of_banks[id] = b
-        banks_balance[id] = []
+        bid = b['id']
+        list_of_banks[bid] = b
+        banks_balance[bid] = []
     # print(list_of_banks[1]['balance'])
 
     # get all bank lines and cc_pays -- these will already be sorted -date_stamp in views.py
@@ -75,7 +76,25 @@ def reconcile_bank_balances(banks, bank_lines, cc_pays, recent_num):
             }
             bank_transactions.append(temp_dict)
 
-        # MISSING DEBIT PAY AND CASH PAY lol
+        # from Cash to '' ==> Cash Expense
+        elif b['from_transaction'] == 1 and b['to_transaction'] is None:
+            temp_dict = {
+                'bank_id': b['from_transaction'],
+                'amount': -b['amount'],
+                'date_stamp': b['date_stamp'],
+                'trans_type': 'Cash Expense'
+            }
+            bank_transactions.append(temp_dict)
+
+        # from Bank to '' ==> Debit Expense
+        elif b['from_transaction'] is not None and b['to_transaction'] is None:
+            temp_dict = {
+                'bank_id': b['from_transaction'],
+                'amount': -b['amount'],
+                'date_stamp': b['date_stamp'],
+                'trans_type': 'Debit Expense'
+            }
+            bank_transactions.append(temp_dict)
 
         # transfer between bank accounts
         else:
@@ -93,6 +112,8 @@ def reconcile_bank_balances(banks, bank_lines, cc_pays, recent_num):
                 'trans_type': 'Bank Transfer'
             }
             bank_transactions.append(temp_dict)
+
+    # credit card payments
     for c in cc_pays:
         temp_dict = {
             'bank_id': c['from_bank'],
@@ -150,29 +171,43 @@ def pd_reconcile_bank_balances(banks, bank_col, bank_lines, bl_col, cc_pays, cp_
     bl['Trans_Type'] = ''
 
     # from Cash to Bank ==> a deposit
-    deposit_bool = (bl['from_transaction'] == 1) & bl['to_transaction'].notna()
+    deposit_bool = (bl['from_transaction'] == 1) & (bl['to_transaction'] > 1)
     # print('Deposit:', bl[deposit_bool])
     bl.loc[deposit_bool, 'Trans_Type'] = 'Deposit'
 
     # from Bank to Cash ==> a Withdrawal
-    withdrawal_bool = bl['from_transaction'].notna() & (bl['to_transaction'] == 1)
+    withdrawal_bool = (bl['from_transaction'] > 1) & (bl['to_transaction'] == 1)
     # print('Withdrawal:', bl[withdrawal_bool])
     bl.loc[withdrawal_bool, 'Trans_Type'] = 'Withdrawal'
 
     # from '' to Cash ==> cash received
-    cash_rcv_bool = bl['from_transaction'].isna() & (bl['to_transaction'] == 1)
+    cash_rcv_bool = (bl['from_transaction'].isna()) & (bl['to_transaction'] == 1)
     # print('Cash Received:', bl[cash_rcv_bool])
-    bl.loc[cash_rcv_bool,'Trans_Type'] = 'Cash Received'
+    bl.loc[cash_rcv_bool, 'Trans_Type'] = 'Cash Received'
 
     # from '' to Bank ==> revenue received
-    rev_rcv_bool = bl['from_transaction'].isna() & (bl['to_transaction'] != 1)
+    rev_rcv_bool = (bl['from_transaction'].isna()) & (bl['to_transaction'] > 1)
     # print('Revenue Received:', bl[rev_rcv_bool])
     bl.loc[rev_rcv_bool, 'Trans_Type'] = 'Revenue Received'
 
+    # from Cash to '' ==> Cash Expense
+    cash_exp_bool = (bl['from_transaction'] == 1) & (bl['to_transaction'].isna())
+    # print('Cash Expense:', bl[cash_exp_bool])
+    bl.loc[cash_exp_bool, 'Trans_Type'] = 'Cash Expense'
+
+    # from Bank to '' ==> Debit Expense
+    debit_exp_bool = (bl['from_transaction'] > 1) & (bl['to_transaction'].isna())
+    # print('Debit Expense:', bl[debit_exp_bool])
+    bl.loc[debit_exp_bool, 'Trans_Type'] = 'Debit Payment'
+
     # transfer between banks
-    transfer_bool = [not i for i in (deposit_bool | withdrawal_bool | cash_rcv_bool | rev_rcv_bool)]
+    transfer_bool = [not i for i in
+                     (deposit_bool | withdrawal_bool | cash_rcv_bool | rev_rcv_bool | cash_exp_bool | debit_exp_bool)]
     # print('Transfers:', bl[transfer_bool])
     bl.loc[transfer_bool, 'Trans_Type'] = 'Bank Transfer'
+    # print([sum(i) for i in [deposit_bool, withdrawal_bool, cash_rcv_bool, rev_rcv_bool, cash_exp_bool,
+    #                         debit_exp_bool, transfer_bool]])
+    # print(len(bl))
 
     # ----- CREDIT CARD PAYMENTS ----- #
     cp['Trans_Type'] = 'Credit Card Payment'
@@ -191,11 +226,14 @@ def pd_reconcile_bank_balances(banks, bank_col, bank_lines, bl_col, cc_pays, cp_
     df = df.append(bl.loc[bl['to_transaction'] > 0, ['to_transaction', 'Trans_Type', 'amount', 'date_stamp']]
                    .rename(columns={'to_transaction': 'account'}))
 
-    # Credit Card Payments
-    df = df.append(cp[['from_bank', 'Trans_Type', 'amount', 'date_stamp']].rename(columns={'from_bank': 'account'}))
+    # Credit Card Payments  -- EXCLUDE, we already take care of this udner bank line items
+    # df = df.append(cp[['from_bank', 'Trans_Type', 'amount', 'date_stamp']].rename(columns={'from_bank': 'account'}))
 
     # Assign Bank Account Names
     df['account_name'] = df['account'].map(bank_dict)
+    # print(type(df.loc[1, 'date_stamp']))
+    # print(type(dt.date(2019, 1, 12)))
+    # print(df.loc[df['date_stamp'] == dt.date(2019, 1, 12)])
 
     # ----- REORDER AND GET BALANCES ----- #
     df.sort_values(by='date_stamp', axis=0, ascending=False, inplace=True)

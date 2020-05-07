@@ -319,9 +319,6 @@ def generate_bank_transfers(flow, date_stamp):
         amount = rdm.randint(300, 800)
         bank_item = generate_bank_line_item(rbc_id, bank_id, amount, date_stamp)
 
-        # update bank balances
-        bank_balances[rbc_id] -= amount
-        bank_balances[bank_id] += amount
     else:
         amount = rdm.randint(6000, 10000)
         # check if bank has that much
@@ -333,11 +330,6 @@ def generate_bank_transfers(flow, date_stamp):
         if bank_balances[bank_id] < amount:
             amount = 0  # transfer nothing
         bank_item = generate_bank_line_item(bank_id, rbc_id, amount, date_stamp)
-        # print('REFRESH RBC:', bank_item)
-
-        # update bank balances
-        bank_balances[bank_id] -= amount
-        bank_balances[rbc_id] += amount
 
     # DEBUG
     # print(bank_item, bank_id, rbc_id, date_stamp)
@@ -379,7 +371,6 @@ def generate_cc_payments(date_stamp):
                     # extend is extending the list with a list
 
                     # update the bank balance and cc balance
-                    bank_balances[bnk] = bal - cb
                     cc_balances[cc] = 0
                     cc_pay_pk += 1
                     break
@@ -403,20 +394,7 @@ def generate_withdraw_deposit(flow, date_stamp):
 
     amount = rdm.randint(50, 200)
 
-    bank_item = dict(
-        model='budget.banklineitem',
-        pk=bl_pk,
-        fields=dict(
-            from_transaction=from_bank,
-            to_transaction=to_bank,
-            amount=Decimal(amount),
-            date_stamp=format(date_stamp, '%Y-%m-%d')
-        )
-    )
-
-    # update bank balances
-    bank_balances[from_bank] -= amount
-    bank_balances[to_bank] += amount
+    bank_item = generate_bank_line_item(from_bank, to_bank, amount, date_stamp)
 
     return [bank_item]
 
