@@ -163,7 +163,6 @@ ADMINS = [('Sinto', 'sinto.ling@gmail.com')]
 X_FRAME_OPTIONS = 'SAMEORIGIN'  # prevent the DENY error
 
 # LOGGING ERRORS
-
 LOGGING = {
     'version': 1,
     'filters': {
