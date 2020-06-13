@@ -1,1 +1,0 @@
-C:/Users/Sinto/Documents/vscodeworkspace/static/scripts/budget_dashboard_v2.js
