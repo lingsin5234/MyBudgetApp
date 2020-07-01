@@ -20,20 +20,20 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '*mud=s7q$k54&4ihm$6g(ik!#_g(+yu)lfxt@w^&s%&1mjj57g'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['138.197.138.227', 'localhost']
+ALLOWED_HOSTS = [os.environ.get('SERVER_IP'), 'localhost']
 
 # setup email
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'looneytoons.lt2019@gmail.com'
-EMAIL_HOST_PASSWORD = 'sint0L!ng201E'
-EMAIL_PORT = 587
+EMAIL_HOST = os.environ.get('EMAIL_HOST')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PWD')
+EMAIL_PORT = os.environ.get('EMAIL_PORT')
 EMAIL_USE_TLS = True
-SERVER_EMAIL = 'looneytoons.lt2019@gmail.com'
+SERVER_EMAIL = os.environ.get('SERVER_EMAIL')
 
 
 # Application definition
@@ -88,25 +88,12 @@ WSGI_APPLICATION = 'djangoapps.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-if DEBUG:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
-
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'testbudget',
-            'USER': 'budgetapp',
-            'PASSWORD': 'nnY6udG3+@pp',
-            'HOST': 'localhost',
-            'PORT': '',
-        }
-    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -156,7 +143,7 @@ STATIC_URL = '/static/'
 
 # ADMIN setting for live site error logging sent by email
 
-ADMINS = [('Sinto', 'sinto.ling@gmail.com')]
+ADMINS = [(os.environ.get('ADMIN_NAME'), os.environ.get('ADMIN_EMAIL'))]
 
 
 # X-Frame for Plotly-Dash
