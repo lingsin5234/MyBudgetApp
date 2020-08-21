@@ -20,6 +20,6 @@ Most data is made up as I went along with the testing. I use this app on my loca
 so there is no real data stored on the server that hosts my Django applications.
 
 ## D3.js
-Again, I explore D3.js in this app, in hopes of providing better visuals for myself to
+I once again explore D3.js in this app, in hopes of providing better visuals for myself to
 filter, sort and group my budgeting data. I hope to explore different types of graphs
 in the near future based on types of line items and categories.
